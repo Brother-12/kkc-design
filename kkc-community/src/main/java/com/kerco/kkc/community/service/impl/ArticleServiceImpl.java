@@ -97,7 +97,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
         List<ArticleVo> result = records.stream().map(v -> {
             ArticleVo articleVo = new ArticleVo();
             BeanUtils.copyProperties(v, articleVo);
-
+            System.out.println("123："+v.getCreateTime());
             String[] split = v.getTagIds().split(",");
             List<String> tagNames = new ArrayList<>();
             for (String s : split) {

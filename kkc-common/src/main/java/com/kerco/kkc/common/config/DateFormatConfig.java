@@ -1,39 +1,29 @@
 package com.kerco.kkc.common.config;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.module.SimpleModule;
-import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.jackson.Jackson2ObjectMapperBuilderCustomizer;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.converter.HttpMessageConverter;
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-import java.text.SimpleDateFormat;
-import java.util.List;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
+/**
+ * 解决日期中 有T的问题
+ */
 @Configuration
-public class DateFormatConfig implements WebMvcConfigurer {
-    /**
-     * 使用此方法, 以下 spring-boot: jackson时间格式化 配置 将会失效
-     * spring.jackson.time-zone=GMT+8
-     * spring.jackson.date-format=yyyy-MM-dd HH:mm:ss
-     * 原因: 会覆盖 @EnableAutoConfiguration 关于 WebMvcAutoConfiguration 的配置
-     * */
-    @Override
-    public void extendMessageConverters(List<HttpMessageConverter<?>> converters) {
-        MappingJackson2HttpMessageConverter converter = new MappingJackson2HttpMessageConverter();
-        ObjectMapper objectMapper = converter.getObjectMapper();
-        // 生成JSON时,将所有Long转换成String
-        SimpleModule simpleModule = new SimpleModule();
-        simpleModule.addSerializer(Long.class, ToStringSerializer.instance);
-        simpleModule.addSerializer(Long.TYPE, ToStringSerializer.instance);
-        objectMapper.registerModule(simpleModule);
-        // 时间格式化
-        objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-        objectMapper.setDateFormat(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"));
-        // 设置格式化内容
-        converter.setObjectMapper(objectMapper);
-        converters.add(0, converter);
+public class DateFormatConfig{
+    @Value("${spring.jackson.date-format:yyyy-MM-dd HH:mm:ss}")
+    private String pattern;
+
+    @Bean
+    public LocalDateTimeSerializer localDateTimeDeserializer() {
+        return new LocalDateTimeSerializer(DateTimeFormatter.ofPattern(pattern));
+    }
+
+    @Bean
+    public Jackson2ObjectMapperBuilderCustomizer jackson2ObjectMapperBuilderCustomizer() {
+        return builder -> builder.serializerByType(LocalDateTime.class, localDateTimeDeserializer());
     }
 }
