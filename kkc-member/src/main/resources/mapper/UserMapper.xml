@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.kerco.kkc.member.mapper.UserMapper">
+
+    <update id="updateUserById" parameterType="com.kerco.kkc.member.entity.User" >
+        update member_user set username = #{username},sex = #{sex},
+                               status = #{status}, avatar = #{avatar},
+                               update_time = #{updateTime}
+        where id = #{id};
+    </update>
+
+    <update id="deleteUserById" >
+        update member_user set status = 2
+            where id = #{id};
+    </update>
+
+    <select id="getUserByKey" resultType="com.kerco.kkc.member.entity.User">
+        select id,nickname,username,password,email,sex,avatar,summary,status,last_login_time,create_time,update_time
+        from member_user where username like #{key};
+    </select>
+
+    <insert id="createNewUser" parameterType="com.kerco.kkc.member.entity.User" >
+        insert into member_user(nickname,username,password,email,create_time,update_time)
+        values(#{username},#{username},#{password},#{email},#{createTime},#{updateTime});
+    </insert>
+
+    <select id="createBeforeCheck" resultType="int">
+        select count(1) from member_user where username = #{username} or email = #{email}
+    </select>
+</mapper>

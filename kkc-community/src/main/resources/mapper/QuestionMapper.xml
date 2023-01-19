@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.kerco.kkc.community.mapper.QuestionMapper">
+
+    <update id="updateQuestionSpecialById" parameterType="com.kerco.kkc.community.entity.Question">
+        update community_question set status = #{status} , examination = #{examination} , update_time = #{updateTime}
+        where id = #{id};
+    </update>
+
+    <update id="deleteQuestionById">
+        update community_question set status = 2,update_time = #{updateTime}
+        where id = #{id};
+    </update>
+</mapper>

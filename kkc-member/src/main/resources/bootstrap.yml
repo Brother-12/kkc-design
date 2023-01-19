@@ -1,0 +1,8 @@
+spring:
+  application:
+    name: kkc-member
+  cloud:
+    nacos:
+      config:
+        server-addr: 127.0.0.1:8848
+        namespace: 702fba52-01e5-4fc6-ab61-7de038b6dad8

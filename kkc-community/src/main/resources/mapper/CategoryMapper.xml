@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.kerco.kkc.community.mapper.CategoryMapper">
+    <resultMap id="categoryTree" type="com.kerco.kkc.community.entity.vo.CategoryTreeVo">
+        <id column="category_id" property="id" />
+        <result column="category_name" property="label" />
+        <association property="children" resultMap="tagTree" />
+    </resultMap>
+
+    <resultMap id="tagTree" type="com.kerco.kkc.community.entity.vo.TagTreeVo">
+        <id column="tag_id" property="id" />
+        <result column="tag_name" property="label" />
+    </resultMap>
+
+    <update id="updateCategoryById" parameterType="com.kerco.kkc.community.entity.Category">
+        update community_category set
+                `name` = #{name},sort = #{sort},status = #{status},update_time = #{updateTime}
+        where id = #{id};
+    </update>
+
+    <update id="deleteCategoryById" >
+        update community_category set status = 2
+        where id = #{id};
+    </update>
+
+    <insert id="createNewUser" parameterType="com.kerco.kkc.community.entity.Category">
+        insert into community_category(`name`,sort,create_time,update_time)
+        values(#{name},#{sort},#{createTime},#{updateTime})
+    </insert>
+
+    <select id="createCategoryCheck" resultType="int">
+        select count(1) from community_category
+        where `name` = #{name}
+    </select>
+
+    <select id="getAllCategoryVoData" resultType="com.kerco.kkc.community.entity.vo.CategoryVo">
+        select id,`name` from community_category where status != 2;
+    </select>
+
+    <select id="getCategoryTree" resultMap="categoryTree">
+        select c.id as category_id,c.name as category_name,t.id as tag_id,t.tag_name as tag_name
+        from community_category c
+                 left join (select id,category_id,tag_name from community_tag where status = 0) t on c.id = t.category_id
+        where c.status = 0;
+    </select>
+</mapper>

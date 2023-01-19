@@ -1,0 +1,21 @@
+server:
+  port: 11000
+spring:
+  datasource:
+    druid:
+      driver-class-name: com.mysql.jdbc.Driver
+      username: root
+      password: 123456
+      url: jdbc:mysql://192.168.250.20:3306/kkc_member?useSSL=false&useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 127.0.0.1:8848
+  application:
+    name: kkc-member
+mybatis-plus:
+  mapper-locations: classpath:/mapper/**/*.xml
+

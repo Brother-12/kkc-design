@@ -1,0 +1,10 @@
+spring:
+  cloud:
+    nacos:
+      config:
+        server-addr: 127.0.0.1:8848
+        namespace: 035adfc3-8bb7-46cc-ba14-cf2bcac10990
+        extension-configs:
+          - data-id: community-dev.yaml
+            group: dev
+            refresh: true

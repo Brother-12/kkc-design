@@ -1,0 +1,23 @@
+server:
+  port: 17890
+spring:
+  application:
+    name: kkc-gateway
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 127.0.0.1:8848
+    gateway:
+      routes:
+        - id: kkc-member
+          uri: lb://kkc-member
+          predicates:
+            - Path=/member/**
+        - id: kkc-community
+          uri: lb://kkc-community
+          predicates:
+            - Path=/community/**
+        - id: kkc-picture
+          uri: lb://kkc-picture
+          predicates:
+            - Path=/upload/**
