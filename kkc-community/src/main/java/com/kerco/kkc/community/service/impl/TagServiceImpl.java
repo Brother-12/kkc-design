@@ -146,4 +146,24 @@ public class TagServiceImpl extends ServiceImpl<TagMapper, Tag> implements TagSe
     public List<TagTreeVo> getKeyTagList() {
         return tagMapper.getKeyTagList();
     }
+
+    /**
+     * 对引用的标签 的refCount 进行+1
+     * @param tagIds 若干个标签id
+     * @param categoryId 分类id
+     */
+    @Override
+    public int incrRefCount(Integer categoryId, List<Integer> tagIds) {
+        return tagMapper.incrRefCount(categoryId, tagIds);
+    }
+
+    /**
+     * 根据分类id获取关联的标签id
+     * @param categoryId 分类id
+     * @return 标签id
+     */
+    @Override
+    public List<String> getTagListByCategoryId(Integer categoryId) {
+        return tagMapper.getTagListByCategoryId(categoryId);
+    }
 }

@@ -25,4 +25,17 @@
         select id,tag_name as label from
             community_tag where status = 0;
     </select>
+
+    <update id="incrRefCount">
+        update community_tag set ref_count = ref_count + 1
+        where category_id = #{categoryId} and
+              id in <foreach collection="tagIds" item="tag" separator="," open="(" close=")">
+                        #{tag}
+                    </foreach>
+    </update>
+
+    <select id="getTagListByCategoryId" resultType="int">
+        select id from community_tag
+        where category_id = #{categoryId}
+    </select>
 </mapper>

@@ -19,12 +19,17 @@
         from member_user where username like #{key};
     </select>
 
-    <insert id="createNewUser" parameterType="com.kerco.kkc.member.entity.User" >
+    <insert id="createNewUser" parameterType="com.kerco.kkc.member.entity.User" useGeneratedKeys="true" keyColumn="id" keyProperty="id">
         insert into member_user(nickname,username,password,email,create_time,update_time)
         values(#{username},#{username},#{password},#{email},#{createTime},#{updateTime});
     </insert>
 
     <select id="createBeforeCheck" resultType="int">
         select count(1) from member_user where username = #{username} or email = #{email}
+    </select>
+
+    <select id="getUserByUsernameAndPassword" resultType="com.kerco.kkc.member.entity.User">
+        select id,nickname,username,password,email,sex,avatar,summary,status,last_login_time,create_time,update_time
+        from member_user where username = #{username} and password = #{password};
     </select>
 </mapper>

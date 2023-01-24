@@ -2,7 +2,16 @@ package com.kerco.kkc.community.service;
 
 import com.kerco.kkc.community.entity.Article;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.kerco.kkc.community.entity.vo.ArticleShowVo;
+import com.kerco.kkc.community.entity.vo.ArticleWriteVo;
+import com.kerco.kkc.community.entity.vo.QuestionWriteVo;
 import com.kerco.kkc.community.utils.PageUtils;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ExecutionException;
 
 /**
  * <p>
@@ -41,4 +50,26 @@ public interface ArticleService extends IService<Article> {
      * @return 删除结果
      */
     int deleteArticleById(Long id);
+
+    /**
+     * 写文章
+     * @param articleWriteVo 写文章要保存的信息
+     * @return 写入结果
+     */
+    void writeArticle(ArticleWriteVo articleWriteVo, HttpServletRequest request) throws ExecutionException, InterruptedException;
+
+    /**
+     * 获取首页的 最新文章和精选文章
+     */
+    Map<String,Object> getIndexArticle();
+
+    /**
+     * 分页获取 文章列表页 的筛选条件
+     * @param categoryId 分类id
+     * @param tagId 标签id
+     * @param condition 10000（最新）、10001（最热）
+     * @param page 当前页数
+     * @return 分页后的文章列表
+     */
+    List<ArticleShowVo> getArticleShowList(Integer categoryId, Integer tagId, Integer condition, Integer page);
 }

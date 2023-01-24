@@ -19,4 +19,11 @@ public interface QuestionContentService extends IService<QuestionContent> {
      * @return 问答内容
      */
     QuestionContent getQuestionContentById(Long questionId);
+
+    /**
+     * 保存问答内容
+     * @param id 问答id
+     * @param content 问答内容
+     */
+    void saveQuestion(Long id, String content);
 }

@@ -1,0 +1,30 @@
+spring:
+  mail:
+    host: smtp.qq.com
+    default-encoding: UTF-8
+    username: 1275309632@qq.com
+    password: bjczkxpwykynhjfe
+    alias: admin
+  redis:
+    host: 192.168.250.20
+    port: 6379
+    database: 0
+    timeout: 1800000
+    lettuce:
+      pool:
+        max-active: 20
+        max-wait: -1
+        max-idle: 5
+        min-idle: 0
+  application:
+    name: kkc-mail
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 127.0.0.1
+
+server:
+  port: 15666
+logging:
+  level:
+    com.kerco.kkc.mail: debug

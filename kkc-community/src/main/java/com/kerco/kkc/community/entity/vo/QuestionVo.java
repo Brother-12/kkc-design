@@ -9,6 +9,10 @@ import lombok.ToString;
 import java.time.LocalDateTime;
 import java.util.List;
 
+/**
+ * 后台 所需要显示的问答类
+ * 在原先的类将tagIds 转为 tagNames
+ */
 @ToString
 @Data
 public class QuestionVo {

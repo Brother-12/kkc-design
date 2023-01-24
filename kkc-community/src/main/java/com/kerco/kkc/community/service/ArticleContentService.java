@@ -19,4 +19,11 @@ public interface ArticleContentService extends IService<ArticleContent> {
      * @return 文章内容
      */
     ArticleContent getArticleContentById(Long articleId);
+
+    /**
+     * 保存文章内容
+     * @param id 文章id
+     * @param content 文章内容
+     */
+    void saveArticleContent(Long id, String content);
 }

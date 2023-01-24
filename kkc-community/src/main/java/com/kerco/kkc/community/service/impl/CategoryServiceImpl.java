@@ -2,6 +2,7 @@ package com.kerco.kkc.community.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.kerco.kkc.community.entity.Article;
 import com.kerco.kkc.community.entity.Category;
 import com.kerco.kkc.community.entity.vo.CategoryTreeVo;
 import com.kerco.kkc.community.entity.vo.CategoryVo;
@@ -124,7 +125,6 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryMapper, Category> i
      */
     @Override
     public List<CategoryTreeVo> getCategoryTree() {
-
         List<CategoryTreeVo> categoryTree = categoryMapper.getCategoryTree();
         return categoryTree;
     }

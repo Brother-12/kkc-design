@@ -1,5 +1,6 @@
 package com.kerco.kkc.community.mapper;
 
+import com.kerco.kkc.community.entity.Article;
 import com.kerco.kkc.community.entity.Category;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.kerco.kkc.community.entity.vo.CategoryTreeVo;
@@ -59,4 +60,5 @@ public interface CategoryMapper extends BaseMapper<Category> {
      * @return 分类树
      */
     List<CategoryTreeVo> getCategoryTree();
+
 }

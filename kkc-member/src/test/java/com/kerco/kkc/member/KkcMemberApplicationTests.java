@@ -1,5 +1,6 @@
 package com.kerco.kkc.member;
 
+import com.kerco.kkc.common.utils.JwtUtils;
 import com.kerco.kkc.member.entity.User;
 import com.kerco.kkc.member.service.UserService;
 import org.junit.jupiter.api.Test;

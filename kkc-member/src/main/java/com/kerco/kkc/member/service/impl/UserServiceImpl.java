@@ -108,4 +108,15 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
         return userMapper.createNewUser(user);
     }
+
+    /**
+     * 根据用户名和密码获取用户信息
+     * @param username 用户名
+     * @param password 密码
+     * @return 用户信息
+     */
+    @Override
+    public User getUserByUsernameAndPassword(String username, String password) {
+        return userMapper.getUserByUsernameAndPassword(username,password);
+    }
 }

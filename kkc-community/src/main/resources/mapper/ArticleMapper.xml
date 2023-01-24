@@ -12,4 +12,50 @@
         update community_article set status = 2,update_time = #{updateTime}
         where id = #{id};
     </update>
+
+    <insert id="createArticle" useGeneratedKeys="true" keyColumn="id" keyProperty="id">
+        insert into community_article(title,author_id,author_username,author_avatar,tag_ids,create_time,update_time)
+        values(#{title},#{authorId},#{authorUsername},#{authorAvatar},#{tagIds},CURRENT_TIMESTAMP(),CURRENT_TIMESTAMP());
+    </insert>
+
+    <select id="getRecentArticle" resultType="com.kerco.kkc.community.entity.vo.ArticleShowVo">
+        select a.id id,title,author_id,author_avatar,author_username,thumbsup,views,official,
+               top,essence,tag_ids,parse_content content,first_img,create_time "publishTime"
+        from community_article a
+                 inner join community_article_content c on a.id = c.id
+        where a.examination = 1 and status = 0 and first_img is not null
+        order by a.create_time desc
+            limit 3;
+    </select>
+
+    <select id="getSpecialArticle" resultType="com.kerco.kkc.community.entity.vo.SpecialVo">
+        select id special_id,author_id,author_username,author_avatar,title special_title,views
+        from community_article
+        where examination = 1 and status = 0
+        order by views
+        limit 6;
+    </select>
+
+    <select id="getArticleShowList" parameterType="map" resultType="com.kerco.kkc.community.entity.vo.ArticleShowVo">
+        select a.id id,title,author_id,author_avatar,author_username,thumbsup,views,official,
+               top,essence,tag_ids,parse_content content,first_img,create_time "publishTime"
+        from community_article a
+                 inner join community_article_content c on a.id = c.id
+        where a.examination = 1 and status = 0
+         <if test="categoryId != 1 and tagId.size() > 1">
+            AND tag_ids regexp replace("<foreach collection="tagId" item="tag" open="(" close=")" separator="|">${tag}</foreach>",' ','')
+         </if>
+        <if test="categoryId != 1 and tagId.size() == 1">
+            AND tag_ids regexp replace("<foreach collection="tagId" item="tag" open="(" close=")" separator="">${tag}</foreach>",' ','')
+        </if>
+        <choose>
+            <when test="condition == 10000">
+                order by a.top desc,a.create_time desc
+            </when>
+            <otherwise>
+                order by a.top desc,a.views desc
+            </otherwise>
+        </choose>
+        limit #{page},10;
+    </select>
 </mapper>

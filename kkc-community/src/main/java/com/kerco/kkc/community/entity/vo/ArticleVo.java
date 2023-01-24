@@ -9,6 +9,10 @@ import lombok.ToString;
 import java.time.LocalDateTime;
 import java.util.List;
 
+/**
+ * 后台 所需要显示的文章类
+ * 在原先的类将tagIds 转为 tagNames
+ */
 @ToString
 @Data
 public class ArticleVo {
@@ -53,7 +57,6 @@ public class ArticleVo {
     @ApiModelProperty("排序 100:默认 1:置顶")
     private Integer sort;
 
-    @TableField(fill = FieldFill.INSERT)
     @ApiModelProperty("创建时间")
     private LocalDateTime createTime;
 }

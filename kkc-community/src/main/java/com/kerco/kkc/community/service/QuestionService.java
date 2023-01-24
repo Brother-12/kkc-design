@@ -2,7 +2,14 @@ package com.kerco.kkc.community.service;
 
 import com.kerco.kkc.community.entity.Question;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.kerco.kkc.community.entity.vo.QuestionShowVo;
+import com.kerco.kkc.community.entity.vo.QuestionWriteVo;
 import com.kerco.kkc.community.utils.PageUtils;
+
+import javax.servlet.http.HttpServletRequest;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ExecutionException;
 
 /**
  * <p>
@@ -42,4 +49,27 @@ public interface QuestionService extends IService<Question> {
      * @return 删除结果
      */
     int deleteQuestionById(Long id);
+
+    /**
+     * 写问答
+     * @param questionWriteVo 写问答要保存的信息
+     * @param request 写入结果
+     */
+    void writeQuestion(QuestionWriteVo questionWriteVo, HttpServletRequest request) throws ExecutionException, InterruptedException;
+
+    /**
+     * 获取首页的问答列表
+     * @return 问答数据
+     */
+    Map<String, Object> getIndexQuestion();
+
+    /**
+     * 分页获取 问答列表页 与筛选条件
+     * @param categoryId 分类id
+     * @param tagId 标签id
+     * @param condition 10000（最新）、10001（最热）
+     * @param page 当前页数
+     * @return 分页后的问答列表
+     */
+    List<QuestionShowVo> getQuestionShowList(Integer categoryId, Integer tagId, Integer condition, Integer page);
 }

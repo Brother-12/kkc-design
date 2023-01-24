@@ -47,4 +47,11 @@ public interface UserMapper extends BaseMapper<User> {
      * @return
      */
     int createBeforeCheck(@Param("email") String email,@Param("username") String username);
+    /**
+     * 根据用户名和密码获取用户信息
+     * @param username 用户名
+     * @param password 密码
+     * @return 用户信息
+     */
+    User getUserByUsernameAndPassword(@Param("username") String username, @Param("password") String password);
 }

@@ -48,4 +48,12 @@ public interface UserService extends IService<User> {
      * @return
      */
     int createNewUser(User user);
+
+    /**
+     * 根据用户名和密码获取用户信息
+     * @param username 用户名
+     * @param password 密码
+     * @return 用户信息
+     */
+    User getUserByUsernameAndPassword(String username, String password);
 }

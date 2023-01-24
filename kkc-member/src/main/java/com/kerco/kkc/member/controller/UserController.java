@@ -1,9 +1,11 @@
 package com.kerco.kkc.member.controller;
 
+import com.kerco.kkc.common.entity.UserTo;
 import com.kerco.kkc.common.utils.CommonResult;
 import com.kerco.kkc.member.entity.User;
 import com.kerco.kkc.member.service.UserService;
 import com.kerco.kkc.member.utils.PageUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.stereotype.Controller;
@@ -55,6 +57,24 @@ public class UserController {
         User user = userService.getUserById(id);
 
         CommonResult<User> result = CommonResult.success(user);
+        return result;
+    }
+
+    /**
+     * 获取用户个人信息
+     * @return 所有用户列表信息
+     */
+    @GetMapping("/in/getUser")
+    public CommonResult<UserTo> getUserByIdToWrite(@RequestParam("id") Long id){
+        if(id == null){
+            return CommonResult.error(10000,"用户id为空");
+        }
+
+        User user = userService.getUserById(id);
+        UserTo userTo = new UserTo();
+        BeanUtils.copyProperties(user,userTo);
+
+        CommonResult<UserTo> result = CommonResult.success(userTo);
         return result;
     }
 

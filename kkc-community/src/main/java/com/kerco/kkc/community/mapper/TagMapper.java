@@ -4,6 +4,7 @@ import com.kerco.kkc.community.entity.Tag;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.kerco.kkc.community.entity.vo.TagTreeVo;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -51,4 +52,13 @@ public interface TagMapper extends BaseMapper<Tag> {
      * @return 所有关键标签信息
      */
     List<TagTreeVo> getKeyTagList();
+
+    /**
+     * 对引用的标签 的refCount 进行+1
+     * @param tagIds 若干个标签id
+     * @param categoryId 分类id
+     */
+    int incrRefCount(@Param("categoryId") Integer categoryId, @Param("tagIds") List<Integer> tagIds);
+
+    List<String> getTagListByCategoryId(Integer categoryId);
 }

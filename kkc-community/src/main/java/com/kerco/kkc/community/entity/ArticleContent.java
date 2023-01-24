@@ -22,7 +22,6 @@ public class ArticleContent implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @ApiModelProperty("文章id")
-    @TableId(value = "id", type = IdType.ASSIGN_ID)
     private Long id;
 
     @ApiModelProperty("文章内容-markdown")

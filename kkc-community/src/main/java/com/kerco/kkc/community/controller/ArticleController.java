@@ -79,7 +79,7 @@ public class ArticleController {
     }
 
     /**
-     * 更新文章的特殊信息(官方、置顶、精华)
+     * 更新文章的特殊信息(官方、置顶、精华、状态)
      * @param article 待更新的文章信息
      * @return 更新结果
      */

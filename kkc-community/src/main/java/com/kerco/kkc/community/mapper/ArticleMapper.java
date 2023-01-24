@@ -2,7 +2,15 @@ package com.kerco.kkc.community.mapper;
 
 import com.kerco.kkc.community.entity.Article;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.kerco.kkc.community.entity.vo.ArticleShowVo;
+import com.kerco.kkc.community.entity.vo.ArticleWriteVo;
+import com.kerco.kkc.community.entity.vo.CurrencyShowVo;
+import com.kerco.kkc.community.entity.vo.SpecialVo;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * <p>
@@ -28,4 +36,26 @@ public interface ArticleMapper extends BaseMapper<Article> {
      * @return 删除结果
      */
     int deleteArticleById(Long id);
+
+    /**
+     * 创建文章
+     * @param article 文章内容
+     */
+    void createArticle(Article article);
+
+    /**
+     * 获取最新的三篇 文章
+     */
+    List<ArticleShowVo> getRecentArticle();
+
+    /**
+     * 获取精选文章
+     */
+    List<SpecialVo> getSpecialArticle();
+
+    /**
+     * 分页获取 文章列表页 的筛选条件
+     * @return 分页后的文章列表
+     */
+    List<ArticleShowVo> getArticleShowList(Map<String,Object> map);
 }
