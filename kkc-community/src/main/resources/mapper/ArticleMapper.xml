@@ -58,4 +58,15 @@
         </choose>
         limit #{page},10;
     </select>
+
+    <select id="getArticleShowById" resultType="com.kerco.kkc.community.entity.vo.ArticleShowVo">
+        select a.id,title,author_id,author_avatar,author_username,thumbsup,views,create_time "publishTime",md_content content
+        from community_article a
+                 inner join community_article_content c on a.id = c.id
+        where a.examination = 1 and status = 0 and a.id = #{id};
+    </select>
+
+    <select id="getArticleListById" resultType="com.kerco.kkc.community.entity.Article">
+        select * from community_article where author_id = #{id};
+    </select>
 </mapper>

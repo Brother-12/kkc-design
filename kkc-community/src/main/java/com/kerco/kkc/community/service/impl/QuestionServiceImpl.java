@@ -296,4 +296,24 @@ public class QuestionServiceImpl extends ServiceImpl<QuestionMapper, Question> i
 
         return questionList;
     }
+
+    /**
+     * 根据用户id 获取用户发布的问答列表
+     * @param id 用户id
+     * @return 用户发布的问答列表
+     */
+    @Override
+    public List<Question> getQuestionListById(Long id) {
+        return questionMapper.getQuestionListById(id);
+    }
+
+    /**
+     * 根据问答id 获取问答具体信息
+     * @param id 问答id
+     * @return QuestionShowVo
+     */
+    @Override
+    public QuestionShowVo getQuestionShowById(Long id) {
+        return questionMapper.getQuestionShowById(id);
+    }
 }

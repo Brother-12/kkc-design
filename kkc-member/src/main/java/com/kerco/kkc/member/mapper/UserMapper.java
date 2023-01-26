@@ -1,5 +1,6 @@
 package com.kerco.kkc.member.mapper;
 
+import com.kerco.kkc.common.entity.UserKeyTo;
 import com.kerco.kkc.member.entity.User;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
@@ -54,4 +55,11 @@ public interface UserMapper extends BaseMapper<User> {
      * @return 用户信息
      */
     User getUserByUsernameAndPassword(@Param("username") String username, @Param("password") String password);
+
+    /**
+     * 根据 若干个用户id 获取用户关键信息
+     * @param list 用户id集合
+     * @return 用户关键信息
+     */
+    List<UserKeyTo> getUserListByIds(@Param("ids") List<Long> list);
 }

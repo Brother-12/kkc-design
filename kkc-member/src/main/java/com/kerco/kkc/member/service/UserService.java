@@ -1,10 +1,12 @@
 package com.kerco.kkc.member.service;
 
+import com.kerco.kkc.common.entity.UserKeyTo;
 import com.kerco.kkc.member.entity.User;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.kerco.kkc.member.utils.PageUtils;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * <p>
@@ -56,4 +58,11 @@ public interface UserService extends IService<User> {
      * @return 用户信息
      */
     User getUserByUsernameAndPassword(String username, String password);
+
+    /**
+     * 根据 若干个用户id 获取用户关键信息
+     * @param list 用户id集合
+     * @return 用户关键信息
+     */
+    Map<Long, UserKeyTo> getUserListByIds(List<Long> list);
 }

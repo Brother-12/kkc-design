@@ -1,5 +1,6 @@
 package com.kerco.kkc.member.controller;
 
+import com.kerco.kkc.common.entity.UserKeyTo;
 import com.kerco.kkc.common.entity.UserTo;
 import com.kerco.kkc.common.utils.CommonResult;
 import com.kerco.kkc.member.entity.User;
@@ -10,7 +11,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.stereotype.Controller;
 
+import javax.validation.constraints.NotEmpty;
 import java.util.List;
+import java.util.Map;
 
 /**
  * <p>
@@ -97,5 +100,11 @@ public class UserController {
         int result = userService.createNewUser(user);
 
         return CommonResult.success("创建成功");
+    }
+
+    @PostMapping("/getUserList")
+    public CommonResult<Map<Long,UserKeyTo>> getUserListByIds(@NotEmpty(message = "用户id不能为空") @RequestBody List<Long> list){
+        Map<Long,UserKeyTo> result = userService.getUserListByIds(list);
+        return CommonResult.success(result);
     }
 }

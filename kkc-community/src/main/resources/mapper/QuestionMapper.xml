@@ -55,4 +55,15 @@
         </choose>
         limit #{page},10;
     </select>
+
+    <select id="getQuestionListById" resultType="com.kerco.kkc.community.entity.Question">
+        select * from community_question where author_id = #{id};
+    </select>
+
+    <select id="getQuestionShowById" resultType="com.kerco.kkc.community.entity.vo.QuestionShowVo">
+        select q.id,title,author_id,author_avatar,author_username,thumbsup,views,create_time "publishTime",md_content content
+        from community_question q
+                 inner join community_question_content c on q.id = c.id
+        where q.examination = 1 and status = 0 and q.id = #{id};
+    </select>
 </mapper>

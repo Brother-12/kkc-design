@@ -3,6 +3,7 @@ package com.kerco.kkc.member.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.google.common.base.Strings;
+import com.kerco.kkc.common.entity.UserKeyTo;
 import com.kerco.kkc.member.entity.User;
 import com.kerco.kkc.member.mapper.UserMapper;
 import com.kerco.kkc.member.service.UserService;
@@ -15,7 +16,9 @@ import org.springframework.util.StringUtils;
 import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * <p>
@@ -118,5 +121,21 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     @Override
     public User getUserByUsernameAndPassword(String username, String password) {
         return userMapper.getUserByUsernameAndPassword(username,password);
+    }
+
+    /**
+     * 根据 若干个用户id 获取用户关键信息
+     * @param list 用户id集合
+     * @return 用户关键信息
+     */
+    @Override
+    public Map<Long, UserKeyTo> getUserListByIds(List<Long> list) {
+        List<UserKeyTo> result = userMapper.getUserListByIds(list);
+
+        if(Objects.isNull(result)){
+            throw new RuntimeException("用户信息获取异常..");
+        }
+
+        return result.stream().collect(Collectors.toMap(UserKeyTo::getId, v -> v));
     }
 }

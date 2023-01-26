@@ -2,4 +2,14 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.kerco.kkc.community.mapper.ArticleCommentMapper">
 
+    <select id="getArticleComment" resultType="com.kerco.kkc.community.entity.ArticleComment">
+        select id,article_id,comment_id,parent_id,reply_id,comment_content,create_time
+        from community_article_comment where article_id = #{id} and status = 0
+        order by parent_id asc;
+    </select>
+
+    <insert id="postComment">
+        insert into community_article_comment(article_id,comment_id,parent_id,reply_id,comment_content,create_time,update_time)
+        values(#{articleId},#{commentId},#{parentId},#{replyId},#{commentContent},#{createTime},#{updateTime});
+    </insert>
 </mapper>

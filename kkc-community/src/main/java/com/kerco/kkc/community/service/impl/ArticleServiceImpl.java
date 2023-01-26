@@ -330,4 +330,24 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
         });
         return articleList;
     }
+
+    /**
+     * 前台 获取文章详细信息
+     * @param id 文章id
+     * @return 文章具体数据
+     */
+    @Override
+    public ArticleShowVo getArticleShowById(Long id) {
+        return articleMapper.getArticleShowById(id);
+    }
+
+    /**
+     * 根据用户id 获取用户发布的文章列表
+     * @param id 用户id
+     * @return 用户发布的文章列表
+     */
+    @Override
+    public List<Article> getArticleListById(Long id) {
+        return articleMapper.getArticleListById(id);
+    }
 }

@@ -17,9 +17,11 @@ spring:
     nacos:
       discovery:
         server-addr: 127.0.0.1
-
+  jackson:
+    default-property-inclusion: NON_EMPTY
 mybatis-plus:
   mapper-locations: classpath:/mapper/**/*.xml
 logging:
   level:
     com.kerco.kkc.community: debug
+

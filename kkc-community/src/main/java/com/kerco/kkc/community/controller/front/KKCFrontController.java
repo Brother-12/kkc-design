@@ -1,22 +1,18 @@
 package com.kerco.kkc.community.controller.front;
 
 import com.kerco.kkc.common.utils.CommonResult;
-import com.kerco.kkc.community.entity.vo.ArticleShowVo;
-import com.kerco.kkc.community.entity.vo.CategoryTreeVo;
-import com.kerco.kkc.community.entity.vo.QuestionShowVo;
-import com.kerco.kkc.community.service.ArticleService;
-import com.kerco.kkc.community.service.CategoryService;
-import com.kerco.kkc.community.service.QuestionService;
+import com.kerco.kkc.community.entity.ArticleComment;
+import com.kerco.kkc.community.entity.vo.*;
+import com.kerco.kkc.community.service.*;
 import com.kerco.kkc.community.utils.PageUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 
 /**
  * 前台主要的 控制器，该控制器定义的方法基本都是公共方法，可以直接获取不用token
@@ -34,6 +30,15 @@ public class KKCFrontController {
 
     @Autowired
     private QuestionService questionService;
+
+    @Autowired
+    private AchievementService achievementService;
+
+    @Autowired
+    private ArticleCommentService articleCommentService;
+
+    @Autowired
+    private QuestionCommentService questionCommentService;
 
     @GetMapping("/category/treeList")
     public CommonResult getCategoryTreeList(){
@@ -99,5 +104,54 @@ public class KKCFrontController {
         List<QuestionShowVo> result = questionService.getQuestionShowList(categoryId,tagId,condition,page);
 
         return CommonResult.success(result);
+    }
+
+    @GetMapping("/article/detail")
+    public CommonResult getArticleById(@RequestParam("id") Long id){
+        ArticleShowVo articleShowVo = articleService.getArticleShowById(id);
+
+        return CommonResult.success(articleShowVo);
+    }
+
+    @GetMapping("/user/achievement")
+    public CommonResult getUserAchievement(@RequestParam("id") Long id) throws ExecutionException, InterruptedException {
+        UserAchievementVo userAchievementVo = achievementService.getUserAchievement(id);
+
+        return CommonResult.success(userAchievementVo);
+    }
+
+    /**
+     * 根据文章id 获取文章的评论列表
+     * @param id 文章id
+     * @return 文章的评论列表
+     */
+    @GetMapping("/article/comment")
+    public CommonResult getArticleComment(@RequestParam("id") Long id){
+        List<CommentVo> list = articleCommentService.getArticleComment(id);
+
+        return CommonResult.success(list);
+    }
+
+    /**
+     * 获取问答的详细信息
+     * @param id 问答id
+     * @return 问答的详细信息
+     */
+    @GetMapping("/question/detail")
+    public CommonResult getQuestionById(@RequestParam("id") Long id){
+        QuestionShowVo questionShowVo = questionService.getQuestionShowById(id);
+
+        return CommonResult.success(questionShowVo);
+    }
+
+    /**
+     * 根据问答id 获取问答的评论列表
+     * @param id 问答id
+     * @return 问答的评论列表
+     */
+    @GetMapping("/question/comment")
+    public CommonResult getQuestionComment(@RequestParam("id") Long id){
+        List<CommentVo> list = questionCommentService.getQuestionComment(id);
+        return CommonResult.success(list);
     }
 }

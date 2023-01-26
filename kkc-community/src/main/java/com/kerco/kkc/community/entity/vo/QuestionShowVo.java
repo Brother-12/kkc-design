@@ -6,9 +6,6 @@ import lombok.ToString;
 @ToString
 @Data
 public class QuestionShowVo extends CurrencyShowVo{
-
     //回答数
     private Integer commentCount;
-
-
 }

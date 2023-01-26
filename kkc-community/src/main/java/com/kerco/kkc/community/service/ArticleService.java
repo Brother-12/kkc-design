@@ -4,6 +4,7 @@ import com.kerco.kkc.community.entity.Article;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.kerco.kkc.community.entity.vo.ArticleShowVo;
 import com.kerco.kkc.community.entity.vo.ArticleWriteVo;
+import com.kerco.kkc.community.entity.vo.PostCommentVo;
 import com.kerco.kkc.community.entity.vo.QuestionWriteVo;
 import com.kerco.kkc.community.utils.PageUtils;
 
@@ -72,4 +73,18 @@ public interface ArticleService extends IService<Article> {
      * @return 分页后的文章列表
      */
     List<ArticleShowVo> getArticleShowList(Integer categoryId, Integer tagId, Integer condition, Integer page);
+
+    /**
+     * 前台 获取文章详细信息
+     * @param id 文章id
+     * @return 文章具体数据
+     */
+    ArticleShowVo getArticleShowById(Long id);
+
+    /**
+     * 根据用户id 获取用户发布的文章列表
+     * @param id 用户id
+     * @return 用户发布的文章列表
+     */
+    List<Article> getArticleListById(Long id);
 }

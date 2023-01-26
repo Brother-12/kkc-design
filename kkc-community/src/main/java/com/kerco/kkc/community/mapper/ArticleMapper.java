@@ -58,4 +58,18 @@ public interface ArticleMapper extends BaseMapper<Article> {
      * @return 分页后的文章列表
      */
     List<ArticleShowVo> getArticleShowList(Map<String,Object> map);
+
+    /**
+     * 前台 获取文章详细信息
+     * @param id 文章id
+     * @return 文章具体数据
+     */
+    ArticleShowVo getArticleShowById(Long id);
+
+    /**
+     * 根据用户id 获取用户发布的文章列表
+     * @param id 用户id
+     * @return 用户发布的文章列表
+     */
+    List<Article> getArticleListById(Long id);
 }

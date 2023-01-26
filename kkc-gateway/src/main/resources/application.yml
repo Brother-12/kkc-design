@@ -12,11 +12,11 @@ spring:
         - id: kkc-member
           uri: lb://kkc-member
           predicates:
-            - Path=/member/**,/access/**
+            - Path=/member/**,/access/**,/follow/**
         - id: kkc-community
           uri: lb://kkc-community
           predicates:
-            - Path=/community/**,/kkc/**,/write/**
+            - Path=/community/**,/kkc/**,/write/**,/post/**
         - id: kkc-picture
           uri: lb://kkc-picture
           predicates:
