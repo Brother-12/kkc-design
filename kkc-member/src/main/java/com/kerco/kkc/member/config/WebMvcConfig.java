@@ -29,7 +29,12 @@ public class WebMvcConfig implements WebMvcConfigurer {
                 "/access/register",
                 //获取评论的用户信息
                 "/member/user/getUserList",
-
+                //获取用户的简单信息
+                "/user/show/getUser",
+                //获取用户的关注列表
+                "/user/follow/list",
+                //获取用户的粉丝列表
+                "/user/followed/list",
                 //html静态资源
                 "/**/*.html",
                 //js静态资源

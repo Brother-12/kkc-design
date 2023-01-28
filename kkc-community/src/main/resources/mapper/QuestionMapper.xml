@@ -17,6 +17,11 @@
         values(#{title},#{authorId},#{authorUsername},#{authorAvatar},#{tagIds},CURRENT_TIMESTAMP(),CURRENT_TIMESTAMP());
     </insert>
 
+    <update id="incrQuestionCount">
+        update community_question set views = views + 1
+        where id = #{id};
+    </update>
+
     <select id="getRecentQuestion" resultType="com.kerco.kkc.community.entity.vo.CurrencyShowVo">
         select q.id id,title,author_id,author_avatar,author_username,thumbsup,views,tag_ids,parse_content content,create_time publishTime
         from community_question q
@@ -30,15 +35,16 @@
         select id special_id,author_id,author_username,author_avatar,title special_title,views
         from community_question
         where examination = 1 and status = 0
-        order by views
+        order by views desc
             limit 4;
     </select>
 
     <select id="getQuestionShowList" parameterType="map" resultType="com.kerco.kkc.community.entity.vo.QuestionShowVo">
-        select q.id id,title,author_id,author_avatar,author_username,thumbsup,views,tag_ids,c.parse_content content,create_time "publishTime"
+        select q.id id,title,author_id,author_avatar,author_username,thumbsup,views,tag_ids,c.parse_content content,q.create_time "publishTime",IFNULL(m.comment_count,0) comment_count
         from community_question q
                  inner join community_question_content c on q.id = c.id
-        where q.examination = 1 and status = 0
+                left join (select question_id,count(1) comment_count from community_question_comment group by question_id) m on q.id = m.question_id
+        where q.examination = 1 and q.status = 0
         <if test="categoryId != 1 and tagId.size() > 1">
             AND tag_ids regexp replace("<foreach collection="tagId" item="tag" open="(" close=")" separator="|">${tag}</foreach>",' ','')
         </if>
@@ -48,6 +54,9 @@
         <choose>
             <when test="condition == 10001">
                 order by q.views desc
+            </when>
+            <when test="condition == 10002">
+                order by comment_count desc
             </when>
             <otherwise>
                 order by q.create_time desc
@@ -65,5 +74,17 @@
         from community_question q
                  inner join community_question_content c on q.id = c.id
         where q.examination = 1 and status = 0 and q.id = #{id};
+    </select>
+
+    <select id="getUserQuestionShowList" resultType="com.kerco.kkc.community.entity.vo.QuestionShowVo">
+        select q.id id,title,author_id,author_avatar,author_username,thumbsup,views,tag_ids,c.parse_content content,q.create_time "publishTime",IFNULL(m.comment_count,0) comment_count
+        from community_question q
+                 inner join community_question_content c on q.id = c.id
+                left join (select question_id,count(1) comment_count from community_question_comment group by question_id) m on q.id = m.question_id
+        where q.examination = 1 and q.status = 0
+          <if test="id != null">and author_id = #{id}</if>
+        <if test="key != null">and title like #{key}</if>
+        <if test="tagId != null">and tag_ids regexp '(${tagId})'</if>
+        limit #{page},10;
     </select>
 </mapper>

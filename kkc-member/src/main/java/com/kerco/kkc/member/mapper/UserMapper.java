@@ -3,10 +3,15 @@ package com.kerco.kkc.member.mapper;
 import com.kerco.kkc.common.entity.UserKeyTo;
 import com.kerco.kkc.member.entity.User;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.kerco.kkc.member.entity.qo.CountQo;
+import com.kerco.kkc.member.entity.vo.UserDetailVo;
+import com.kerco.kkc.member.entity.vo.UserInfoVo;
+import com.kerco.kkc.member.entity.vo.UserSimpleShowVo;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * <p>
@@ -62,4 +67,46 @@ public interface UserMapper extends BaseMapper<User> {
      * @return 用户关键信息
      */
     List<UserKeyTo> getUserListByIds(@Param("ids") List<Long> list);
+
+    /**
+     * 获取用户简单的信息
+     * @param id 用户id
+     * @return 用户信息
+     */
+    UserSimpleShowVo getUserSimpleShowById(@Param("id") Long id);
+
+    /**
+     * 获取当前用户的 关注数和粉丝数
+     * @param id
+     * @return
+     */
+    List<CountQo> getFollowerCountAndFollowedCountById(@Param("id") Long id);
+
+    /**
+     * 获取用户的 关注用户列表
+     * @param id 用户id
+     * @return 关注用户列表
+     */
+    List<UserInfoVo> getUserFollowList(@Param("id") Long id);
+
+    /**
+     * 获取用户的 粉丝列表
+     * @param id 用户id
+     * @return 粉丝列表
+     */
+    List<UserInfoVo> getUserFollowedList(@Param("id") Long id);
+
+    /**
+     * 获取用户详细信息
+     * @param id 用户id
+     * @return 用户详细信息
+     */
+    UserDetailVo getUserDetailById(@Param("id") Long id);
+
+    /**
+     * 用户 修改自己的个人信息
+     * @param user 用户信息
+     * @return 修改结果
+     */
+    int updateUserInfoByUser(User user);
 }

@@ -4,12 +4,14 @@ import com.kerco.kkc.common.entity.UserKeyTo;
 import com.kerco.kkc.common.utils.CommonResult;
 import com.kerco.kkc.community.entity.ArticleComment;
 import com.kerco.kkc.community.entity.ArticleContent;
+import com.kerco.kkc.community.entity.Message;
 import com.kerco.kkc.community.entity.vo.CommentVo;
 import com.kerco.kkc.community.entity.vo.PostCommentVo;
 import com.kerco.kkc.community.feign.MemberFeign;
 import com.kerco.kkc.community.mapper.ArticleCommentMapper;
 import com.kerco.kkc.community.service.ArticleCommentService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.kerco.kkc.community.service.MessageService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -33,6 +35,9 @@ public class ArticleCommentServiceImpl extends ServiceImpl<ArticleCommentMapper,
 
     @Autowired
     private MemberFeign memberFeign;
+
+    @Autowired
+    private MessageService messageService;
 
     /**
      * 根据文章id 获取文章的评论列表
@@ -102,11 +107,13 @@ public class ArticleCommentServiceImpl extends ServiceImpl<ArticleCommentMapper,
         articleComment.setArticleId(postCommentVo.getId());
         articleComment.setCommentContent(postCommentVo.getCommentContent());
         articleComment.setCommentId(postCommentVo.getCommentId());
+        //如果parentId为null，说明是一级评论
         if(Objects.isNull(postCommentVo.getParentId())){
             articleComment.setParentId(0L);
         }else{
             articleComment.setParentId(postCommentVo.getParentId());
         }
+        //如果replyId为null，说明是一级评论
         if(Objects.isNull(postCommentVo.getReplyId())){
             articleComment.setReplyId(0L);
         }else{
@@ -116,6 +123,27 @@ public class ArticleCommentServiceImpl extends ServiceImpl<ArticleCommentMapper,
         int i = articleCommentMapper.postComment(articleComment);
         if(i == 0){
             throw new RuntimeException("评论出现异常...");
+        }else{
+            //TODO 在这里实现 用户评论消息
+            //思路
+            //1.使用rabbitmq的消息机制 添加消息
+            //2.开启异步任务 添加消息
+            Message message = new Message();
+            //运行到这边就说明评论已经加入到数据库了，所以直接判断即可
+            if(Objects.isNull(postCommentVo.getParentId()) && Objects.isNull(postCommentVo.getReplyId())){
+                message.setOptOperation(1);
+                //如果是一级评论，则消息的接收是 文章作者id
+
+            }else{
+                message.setOptOperation(2);
+                //如果是二级评论，则消息的接收是 一级评论的用户id
+                message.setUserId(postCommentVo.getReplyId());
+            }
+            message.setOptType(0);
+            message.setOptId(postCommentVo.getId());
+            message.setClientId(postCommentVo.getCommentId());
+
+            messageService.acceptCommentMessage(message);
         }
     }
 }

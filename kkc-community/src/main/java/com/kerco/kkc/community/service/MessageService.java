@@ -13,4 +13,9 @@ import com.baomidou.mybatisplus.extension.service.IService;
  */
 public interface MessageService extends IService<Message> {
 
+    /**
+     * 接收消息处理
+     * @param message 消息
+     */
+    void acceptCommentMessage(Message message);
 }

@@ -5,7 +5,7 @@ import lombok.ToString;
 
 @ToString
 @Data
-public class QuestionShowVo extends CurrencyShowVo{
+public class QuestionShowVo extends CurrencyShowVo {
     //回答数
-    private Integer commentCount;
+    private Integer commentCount = 0;
 }

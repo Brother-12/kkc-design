@@ -4,15 +4,22 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.google.common.base.Strings;
 import com.kerco.kkc.common.entity.UserKeyTo;
+import com.kerco.kkc.common.utils.JwtUtils;
 import com.kerco.kkc.member.entity.User;
+import com.kerco.kkc.member.entity.qo.CountQo;
+import com.kerco.kkc.member.entity.vo.UserDetailVo;
+import com.kerco.kkc.member.entity.vo.UserInfoVo;
+import com.kerco.kkc.member.entity.vo.UserSimpleShowVo;
 import com.kerco.kkc.member.mapper.UserMapper;
 import com.kerco.kkc.member.service.UserService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.kerco.kkc.member.utils.PageUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
@@ -137,5 +144,86 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         }
 
         return result.stream().collect(Collectors.toMap(UserKeyTo::getId, v -> v));
+    }
+
+    /**
+     * 前台：获取用户简单的信息
+     * @param id 用户id
+     * @return 用户简单的信息
+     */
+    @Override
+    public UserSimpleShowVo getUserSimpleShowById(Long id) {
+        UserSimpleShowVo userSimpleShowVo = userMapper.getUserSimpleShowById(id);
+        List<CountQo> list = userMapper.getFollowerCountAndFollowedCountById(id);
+        list.forEach(v -> {
+            //这里利用-1来做占位符，减少去数据库的查询次数
+            if(v.getFollowedCount() != -1){
+                userSimpleShowVo.setFollowedCount(v.getFollowedCount());
+            }else{
+                userSimpleShowVo.setFollowerCount(v.getFollowerCount());
+            }
+        });
+        return userSimpleShowVo;
+    }
+
+    /**
+     * 获取用户的 关注用户列表
+     * @param id 用户id
+     * @return 关注用户列表
+     */
+    @Override
+    public List<UserInfoVo> getUserFollowList(Long id) {
+        return userMapper.getUserFollowList(id);
+    }
+
+    /**
+     * 获取用户的 粉丝列表
+     * @param id 用户id
+     * @return 粉丝列表
+     */
+    @Override
+    public List<UserInfoVo> getUserFollowedList(Long id) {
+        return userMapper.getUserFollowedList(id);
+    }
+
+    /**
+     * 获取用户详细信息
+     * @param id 用户id
+     * @param request HttpServletRequest
+     * @return 用户详细信息
+     */
+    @Override
+    public UserDetailVo getUserDetailById(Long id, HttpServletRequest request) {
+        String token = request.getHeader("token");
+        Map<String, Object> userMap = JwtUtils.getPayLoadALSOExcludeExpAndIat(token);
+        //检查是否是越界访问其他用户的信息
+        if(Long.parseLong(userMap.get("id").toString()) == id){
+            return userMapper.getUserDetailById(id);
+        }
+        return null;
+    }
+
+    /**
+     * 前台：修改用户的信息
+     * @return 修改结果
+     */
+    @Override
+    public int updateUserDetail(UserSimpleShowVo userSimpleShowVo,HttpServletRequest request) {
+        //从请求头中获取token
+        String token = request.getHeader("token");
+        //从token中获取用户信息
+        Map<String, Object> userMap = JwtUtils.getPayLoadALSOExcludeExpAndIat(token);
+        //检查是否是越界访问其他用户的信息
+        if(Long.parseLong(userMap.get("id").toString()) == userSimpleShowVo.getId()){
+            User user = new User();
+            user.setId(userSimpleShowVo.getId());
+            user.setSex(userSimpleShowVo.getSex().equals("女") ? "女" : "男");
+            user.setAvatar(userSimpleShowVo.getAvatar());
+            user.setSummary(userSimpleShowVo.getSummary());
+
+            return userMapper.updateUserInfoByUser(user);
+        }
+
+        throw new RuntimeException("用户操作异常....");
     }
 }

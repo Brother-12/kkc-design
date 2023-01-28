@@ -47,32 +47,48 @@ public class AchievementServiceImpl implements AchievementService {
         //利用AtomicInteger原子类解决 并发问题
         AtomicInteger thumbsUpCount = new AtomicInteger();
         AtomicInteger originalCount = new AtomicInteger();
+        AtomicInteger viewsCount = new AtomicInteger();
         UserAchievementVo userAchievementVo = new UserAchievementVo();
         //1.获取用户发表的文章列表和问答列表，并且统计发表数量及获取的点赞数
         CompletableFuture<Void> future = CompletableFuture.runAsync(() -> {
+            //局部变量，用来统计点赞数与浏览数之和
             int thumbs = 0;
+            int views = 0;
             List<Article> articleList = articleService.getArticleListById(id);
             for (Article article : articleList) {
                 thumbs+=article.getThumbsup();
+                views+=article.getViews();
             }
+            //利用原子类进行相加操作
             while(!thumbsUpCount.compareAndSet(thumbsUpCount.get(),thumbsUpCount.get() + thumbs)){}
             while(!originalCount.compareAndSet(originalCount.get(),originalCount.get() + articleList.size())){}
+            while(!viewsCount.compareAndSet(viewsCount.get(),viewsCount.get() + views)){}
         }, executor);
 
         CompletableFuture<Void> future1 = CompletableFuture.runAsync(() -> {
+            //局部变量，用来统计点赞数与浏览数之和
             int thumbs = 0;
+            int views = 0;
             List<Question> questionList = questionService.getQuestionListById(id);
             for (Question question : questionList) {
                 thumbs += question.getThumbsup();
+                views += question.getViews();
             }
+            //利用原子类进行相加操作
             while(!thumbsUpCount.compareAndSet(thumbsUpCount.get(),thumbsUpCount.get() + thumbs)){}
             while(!originalCount.compareAndSet(originalCount.get(),originalCount.get() + questionList.size())){}
+            while(!viewsCount.compareAndSet(viewsCount.get(),viewsCount.get() + views)){}
         }, executor);
 
+        //等待所有异步任务的完成
         CompletableFuture.allOf(future,future1).get();
-        //TODO 收藏数与关注数还没有实现
+
+        //赋值
         userAchievementVo.setOriginalCount(originalCount.get());
         userAchievementVo.setThumbsUpCount(thumbsUpCount.get());
+        userAchievementVo.setViewsCount(viewsCount.get());
+
+        //TODO 收藏数与关注数还没有实现
         return userAchievementVo;
     }
 }

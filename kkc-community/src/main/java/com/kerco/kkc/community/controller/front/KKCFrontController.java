@@ -40,6 +40,9 @@ public class KKCFrontController {
     @Autowired
     private QuestionCommentService questionCommentService;
 
+    @Autowired
+    private SearchService searchService;
+
     @GetMapping("/category/treeList")
     public CommonResult getCategoryTreeList(){
         List<CategoryTreeVo> categoryTree = categoryService.getCategoryTree();
@@ -91,7 +94,7 @@ public class KKCFrontController {
      * 分页获取 问答列表页 与筛选条件
      * @param categoryId 分类id
      * @param tagId 标签id
-     * @param condition 10000（最新）、10001（最热）
+     * @param condition 10000（最新）、10001（最热）、10002（最多回答）
      * @param page 当前页数
      * @return 分页后的问答列表
      */
@@ -153,5 +156,49 @@ public class KKCFrontController {
     public CommonResult getQuestionComment(@RequestParam("id") Long id){
         List<CommentVo> list = questionCommentService.getQuestionComment(id);
         return CommonResult.success(list);
+    }
+
+    /**
+     * 根据用户id 分页获取用户发表的文章列表
+     * @param id 用户id
+     * @param page 当前页数
+     * @return 用户发表的文章列表
+     */
+    @GetMapping("/article/user/publish")
+    public CommonResult getUserArticleShowList(@RequestParam("id") Long id,
+                                               @RequestParam(value = "currentPage",required = false) Integer page){
+        List<ArticleShowVo> result =  articleService.getUserArticleShowList(id,page);
+
+        return CommonResult.success(result);
+    }
+
+    /**
+     * 根据用户id 分页获取用户发表的问答列表
+     * @param id 用户id
+     * @param page 当前页数
+     * @return 用户发表的问答列表
+     */
+    @GetMapping("/question/user/publish")
+    public CommonResult getUserQuestionShowList(@RequestParam("id") Long id,
+                                               @RequestParam(value = "currentPage",required = false) Integer page){
+        List<QuestionShowVo> result =  questionService.getUserQuestionShowList(id,page);
+
+        return CommonResult.success(result);
+    }
+
+    @GetMapping("/search")
+    public CommonResult searchKey(@RequestParam(value = "currentPage",required = false) Integer page,
+                                  @RequestParam("key") String key) throws ExecutionException, InterruptedException {
+        Map<String, Object> stringObjectMap = searchService.searchKey(key, page);
+
+        return CommonResult.success(stringObjectMap);
+    }
+
+    @GetMapping("/tag/search")
+    public CommonResult searchTag(@RequestParam(value = "currentPage",required = false) Integer page,
+                                  @RequestParam("id") Integer id) throws ExecutionException, InterruptedException {
+        Map<String, Object> stringObjectMap = searchService.searchTag(id, page);
+
+        return CommonResult.success(stringObjectMap);
     }
 }

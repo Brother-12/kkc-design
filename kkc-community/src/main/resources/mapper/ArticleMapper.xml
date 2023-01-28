@@ -18,6 +18,10 @@
         values(#{title},#{authorId},#{authorUsername},#{authorAvatar},#{tagIds},CURRENT_TIMESTAMP(),CURRENT_TIMESTAMP());
     </insert>
 
+    <update id="incrArticleCount">
+        update community_article set views = views + 1 where id = #{id};
+    </update>
+
     <select id="getRecentArticle" resultType="com.kerco.kkc.community.entity.vo.ArticleShowVo">
         select a.id id,title,author_id,author_avatar,author_username,thumbsup,views,official,
                top,essence,tag_ids,parse_content content,first_img,create_time "publishTime"
@@ -32,7 +36,7 @@
         select id special_id,author_id,author_username,author_avatar,title special_title,views
         from community_article
         where examination = 1 and status = 0
-        order by views
+        order by views desc
         limit 6;
     </select>
 
@@ -56,6 +60,18 @@
                 order by a.top desc,a.views desc
             </otherwise>
         </choose>
+        limit #{page},10;
+    </select>
+
+    <select id="getUserArticleShowList" resultType="com.kerco.kkc.community.entity.vo.ArticleShowVo">
+        select a.id id,title,author_id,author_avatar,author_username,thumbsup,views,official,
+               top,essence,tag_ids,parse_content content,first_img,create_time "publishTime"
+        from community_article a
+                 inner join community_article_content c on a.id = c.id
+        where a.examination = 1 and status = 0
+            <if test="id != null">  and author_id = #{id} </if>
+           <if test="key != null">and title like #{key}</if>
+            <if test="tagId != null">and tag_ids regexp '(${tagId})'</if>
         limit #{page},10;
     </select>
 

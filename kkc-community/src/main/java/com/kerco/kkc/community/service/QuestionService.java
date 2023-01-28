@@ -86,4 +86,28 @@ public interface QuestionService extends IService<Question> {
      * @return QuestionShowVo
      */
     QuestionShowVo getQuestionShowById(Long id);
+
+    /**
+     * 根据用户id 分页获取用户发表的问答列表
+     * @param id 用户id
+     * @param page 当前页数
+     * @return 用户发表的问答列表
+     */
+    List<QuestionShowVo> getUserQuestionShowList(Long id, Integer page);
+
+    /**
+     * 根据关键字获取问答列表
+     * @param key 关键字
+     * @param page 当前页
+     * @return 问答列表
+     */
+    List<QuestionShowVo> getQuestionShowByKey(String key, Integer page);
+
+    /**
+     * 根据标签id 获取问答列表
+     * @param id 标签id
+     * @param page 当前页
+     * @return 搜索结果
+     */
+    List<QuestionShowVo> getQuestionShowByTagId(Integer id, Integer page);
 }

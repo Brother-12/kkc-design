@@ -332,12 +332,14 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
     }
 
     /**
-     * 前台 获取文章详细信息
+     * 前台 获取文章详细信息 同时增加浏览次数
      * @param id 文章id
      * @return 文章具体数据
      */
     @Override
     public ArticleShowVo getArticleShowById(Long id) {
+        //增加浏览文章次数
+        articleMapper.incrArticleCount(id);
         return articleMapper.getArticleShowById(id);
     }
 
@@ -349,5 +351,121 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
     @Override
     public List<Article> getArticleListById(Long id) {
         return articleMapper.getArticleListById(id);
+    }
+
+    /**
+     * 根据用户id 分页获取用户发表的文章列表
+     * @param id 用户id
+     * @param page 当前页数
+     * @return 用户发表的文章列表
+     */
+    @Override
+    public List<ArticleShowVo> getUserArticleShowList(Long id, Integer page) {
+        if(page == null || page < 1){
+            page = 1;
+        }
+
+        //获取用户发表的文章列表
+        List<ArticleShowVo> articleList = articleMapper.getUserArticleShowList(id,(page - 1) * 10,null,null);
+
+        //获取tag标签关键信息
+        List<TagTreeVo> keyTagList = tagService.getKeyTagList();
+        //转为map集合，加快查询速度
+        Map<Integer, TagTreeVo> tagMap = keyTagList.stream().collect(Collectors.toMap(TagTreeVo::getId, (v)-> v));
+
+        //根据tag_id 获取具体的tag关键信息
+        articleList.forEach(v -> {
+            String[] split = v.getTagIds().split(",");
+            List<TagTreeVo> list1 = new ArrayList<>();
+            for (String s : split) {
+                TagTreeVo tagTreeVo = tagMap.get(Integer.parseInt(s));
+                if(Objects.nonNull(tagTreeVo)){
+                    list1.add(tagTreeVo);
+                }
+            }
+            v.setTagList(list1);
+        });
+
+        return articleList;
+    }
+
+    /**
+     * 根据关键字 获取文章列表
+     * @param key 关键字
+     * @param page 当前页
+     * @return 文章列表
+     */
+    @Override
+    public List<ArticleShowVo> getArticleShowByKey(String key,Integer page) {
+        if(page == null || page < 1){
+            page = 1;
+        }
+
+        //获取用户发表的文章列表
+        List<ArticleShowVo> articleList = articleMapper.getUserArticleShowList(null,(page - 1) * 10,'%'+key+'%',null);
+
+        if(articleList.size() == 0){
+            return articleList;
+        }
+
+        //获取tag标签关键信息
+        List<TagTreeVo> keyTagList = tagService.getKeyTagList();
+        //转为map集合，加快查询速度
+        Map<Integer, TagTreeVo> tagMap = keyTagList.stream().collect(Collectors.toMap(TagTreeVo::getId, (v)-> v));
+
+        //根据tag_id 获取具体的tag关键信息
+        articleList.forEach(v -> {
+            String[] split = v.getTagIds().split(",");
+            List<TagTreeVo> list1 = new ArrayList<>();
+            for (String s : split) {
+                TagTreeVo tagTreeVo = tagMap.get(Integer.parseInt(s));
+                if(Objects.nonNull(tagTreeVo)){
+                    list1.add(tagTreeVo);
+                }
+            }
+            v.setTagList(list1);
+        });
+
+        return articleList;
+    }
+
+    /**
+     * 根据标签id 获取文章列表
+     * @param id 标签id
+     * @param page 当前页
+     * @return 搜索结果
+     */
+    @Override
+    public List<ArticleShowVo> getArticleShowByTagId(Integer id, Integer page) {
+        if(page == null || page < 1){
+            page = 1;
+        }
+
+        //获取用户发表的文章列表
+        List<ArticleShowVo> articleList = articleMapper.getUserArticleShowList(null,(page - 1) * 10,null,id);
+
+        if(articleList.size() == 0){
+            return articleList;
+        }
+
+        //获取tag标签关键信息
+        List<TagTreeVo> keyTagList = tagService.getKeyTagList();
+        //转为map集合，加快查询速度
+        Map<Integer, TagTreeVo> tagMap = keyTagList.stream().collect(Collectors.toMap(TagTreeVo::getId, (v)-> v));
+
+        //根据tag_id 获取具体的tag关键信息
+        articleList.forEach(v -> {
+            String[] split = v.getTagIds().split(",");
+            List<TagTreeVo> list1 = new ArrayList<>();
+            for (String s : split) {
+                TagTreeVo tagTreeVo = tagMap.get(Integer.parseInt(s));
+                if(Objects.nonNull(tagTreeVo)){
+                    list1.add(tagTreeVo);
+                }
+            }
+            v.setTagList(list1);
+        });
+
+        return articleList;
     }
 }

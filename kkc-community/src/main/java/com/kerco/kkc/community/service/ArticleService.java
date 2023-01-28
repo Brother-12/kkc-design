@@ -87,4 +87,28 @@ public interface ArticleService extends IService<Article> {
      * @return 用户发布的文章列表
      */
     List<Article> getArticleListById(Long id);
+
+    /**
+     * 根据用户id 分页获取用户发表的文章列表
+     * @param id 用户id
+     * @param page 当前页数
+     * @return 用户发表的文章列表
+     */
+    List<ArticleShowVo> getUserArticleShowList(Long id, Integer page);
+
+    /**
+     * 根据关键字 获取文章列表
+     * @param key 关键字
+     * @param page 当前页
+     * @return 文章列表
+     */
+    List<ArticleShowVo> getArticleShowByKey(String key,Integer page);
+
+    /**
+     * 根据标签id 获取文章列表
+     * @param id 标签id
+     * @param page 当前页
+     * @return 搜索结果
+     */
+    List<ArticleShowVo> getArticleShowByTagId(Integer id, Integer page);
 }

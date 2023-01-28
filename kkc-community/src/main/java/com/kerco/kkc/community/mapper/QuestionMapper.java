@@ -6,6 +6,7 @@ import com.kerco.kkc.community.entity.vo.CurrencyShowVo;
 import com.kerco.kkc.community.entity.vo.QuestionShowVo;
 import com.kerco.kkc.community.entity.vo.SpecialVo;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 import java.util.Map;
@@ -69,4 +70,18 @@ public interface QuestionMapper extends BaseMapper<Question> {
      * @return QuestionShowVo
      */
     QuestionShowVo getQuestionShowById(Long id);
+
+    /**
+     * 根据用户id 分页获取用户发表的问答列表
+     * @param id 用户id
+     * @param page 当前页数
+     * @return 用户发表的问答列表
+     */
+    List<QuestionShowVo> getUserQuestionShowList(@Param("id") Long id,@Param("page") Integer page,@Param("key") String key,@Param("tagId") Integer tagId);
+
+    /**
+     * 增加浏览次数
+     * @param id 问答id
+     */
+    void incrQuestionCount(@Param("id") Long id);
 }

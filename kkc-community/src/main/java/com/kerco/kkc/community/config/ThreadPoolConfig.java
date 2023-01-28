@@ -10,7 +10,6 @@ import java.util.concurrent.TimeUnit;
 
 @Configuration
 public class ThreadPoolConfig {
-
     /**
      * 自定义线程池
      * @return 线程池

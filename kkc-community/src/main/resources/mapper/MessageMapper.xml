@@ -2,4 +2,8 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.kerco.kkc.community.mapper.MessageMapper">
 
+    <insert id="saveMessage">
+        insert into community_message(client_id,client_username,client_avatar,user_id,opt_operation,opt_type,opt_id,opt_title,create_time,update_time)
+        values(#{clientId},#{clientUsername},#{clientAvatar},#{userId},#{optOperation},#{optType},#{optId},#{optTitle},#{createTime},#{updateTime});
+    </insert>
 </mapper>

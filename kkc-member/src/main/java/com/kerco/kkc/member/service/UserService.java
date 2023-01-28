@@ -3,8 +3,12 @@ package com.kerco.kkc.member.service;
 import com.kerco.kkc.common.entity.UserKeyTo;
 import com.kerco.kkc.member.entity.User;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.kerco.kkc.member.entity.vo.UserDetailVo;
+import com.kerco.kkc.member.entity.vo.UserInfoVo;
+import com.kerco.kkc.member.entity.vo.UserSimpleShowVo;
 import com.kerco.kkc.member.utils.PageUtils;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.Map;
 
@@ -65,4 +69,39 @@ public interface UserService extends IService<User> {
      * @return 用户关键信息
      */
     Map<Long, UserKeyTo> getUserListByIds(List<Long> list);
+
+    /**
+     * 前台：获取用户简单的信息
+     * @param id 用户id
+     * @return 用户简单的信息
+     */
+    UserSimpleShowVo getUserSimpleShowById(Long id);
+
+    /**
+     * 获取用户的 关注用户列表
+     * @param id 用户id
+     * @return 关注用户列表
+     */
+    List<UserInfoVo> getUserFollowList(Long id);
+
+    /**
+     * 获取用户的 粉丝列表
+     * @param id 用户id
+     * @return 粉丝列表
+     */
+    List<UserInfoVo> getUserFollowedList(Long id);
+
+    /**
+     * 获取用户详细信息
+     * @param id 用户id
+     * @param request HttpServletRequest
+     * @return 用户详细信息
+     */
+    UserDetailVo getUserDetailById(Long id, HttpServletRequest request);
+
+    /**
+     * 前台：修改用户的信息
+     * @return 修改结果
+     */
+    int updateUserDetail(UserSimpleShowVo userSimpleShowVo,HttpServletRequest request);
 }

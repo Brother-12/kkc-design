@@ -17,6 +17,8 @@ public class UserAchievementVo {
     //点赞数
     private Integer thumbsUpCount = 0;
 
+    private Integer viewsCount = 0;
+
     //粉丝数
     private Integer followedCount = 0;
 
@@ -37,5 +39,9 @@ public class UserAchievementVo {
 
     public void setCollectionCount(Integer collectionCount) {
         this.collectionCount = collectionCount;
+    }
+
+    public void setViewsCount(Integer viewsCount) {
+        this.viewsCount = viewsCount;
     }
 }

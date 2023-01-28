@@ -72,4 +72,18 @@ public interface ArticleMapper extends BaseMapper<Article> {
      * @return 用户发布的文章列表
      */
     List<Article> getArticleListById(Long id);
+
+    /**
+     * 根据用户id 分页获取用户发表的文章列表
+     * @param id 用户id
+     * @param page 当前页数
+     * @return 用户发表的文章列表
+     */
+    List<ArticleShowVo> getUserArticleShowList(@Param("id") Long id, @Param("page") Integer page,@Param("key") String key,@Param("tagId") Integer tagId);
+
+    /**
+     * 增加浏览次数
+     * @param id 文章id
+     */
+    void incrArticleCount(@Param("id") Long id);
 }

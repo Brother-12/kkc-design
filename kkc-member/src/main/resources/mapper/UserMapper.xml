@@ -40,4 +40,33 @@
             #{id}
         </foreach>
     </select>
+
+    <select id="getUserSimpleShowById" resultType="com.kerco.kkc.member.entity.vo.UserSimpleShowVo">
+        select id,username,avatar,summary,sex,create_time from member_user where id = #{id} and status = 0;
+    </select>
+
+    <select id="getFollowerCountAndFollowedCountById" resultType="com.kerco.kkc.member.entity.qo.CountQo">
+        select count(1) as followed_count,-1 follower_count from member_follow where followed_id = #{id} and status = 0
+        union
+        select -1 followed_count,count(1) as follower_count from member_follow where follower_id = #{id} and status = 0;
+    </select>
+
+    <select id="getUserFollowList" resultType="com.kerco.kkc.member.entity.vo.UserInfoVo">
+        select id,username,avatar from member_user
+        where id in (select follower_id from member_follow where followed_id = #{id} and status = 0);
+    </select>
+
+    <select id="getUserFollowedList" resultType="com.kerco.kkc.member.entity.vo.UserInfoVo">
+        select id,username,avatar from member_user
+        where id in (select followed_id from member_follow where follower_id = #{id} and status = 0);
+    </select>
+
+    <select id="getUserDetailById" resultType="com.kerco.kkc.member.entity.vo.UserDetailVo">
+        select id,username,avatar,summary,sex,email from member_user where id = #{id} and status = 0;
+    </select>
+
+    <update id="updateUserInfoByUser">
+        update member_user set avatar = #{avatar},sex = #{sex},summary = #{summary},update_time = #{updateTime}
+        where id = #{id};
+    </update>
 </mapper>

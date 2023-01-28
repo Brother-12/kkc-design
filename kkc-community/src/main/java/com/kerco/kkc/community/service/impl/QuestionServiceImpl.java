@@ -293,7 +293,6 @@ public class QuestionServiceImpl extends ServiceImpl<QuestionMapper, Question> i
             }
             v.setTagList(list1);
         });
-
         return questionList;
     }
 
@@ -308,12 +307,129 @@ public class QuestionServiceImpl extends ServiceImpl<QuestionMapper, Question> i
     }
 
     /**
-     * 根据问答id 获取问答具体信息
+     * 根据问答id 获取问答具体信息 同时浏览次数+1
      * @param id 问答id
      * @return QuestionShowVo
      */
     @Override
     public QuestionShowVo getQuestionShowById(Long id) {
+        questionMapper.incrQuestionCount(id);
         return questionMapper.getQuestionShowById(id);
+    }
+
+    /**
+     * 根据用户id 分页获取用户发表的问答列表
+     * @param id 用户id
+     * @param page 当前页数
+     * @return 用户发表的问答列表
+     */
+    @Override
+    public List<QuestionShowVo> getUserQuestionShowList(Long id, Integer page) {
+        if(page == null || page < 1){
+            page = 1;
+        }
+
+        //获取用户发表的问答列表
+        List<QuestionShowVo> questionList = questionMapper.getUserQuestionShowList(id,(page - 1) * 10,null,null);
+
+        //获取tag标签关键信息
+        List<TagTreeVo> keyTagList = tagService.getKeyTagList();
+        //转为map集合，加快查询速度
+        Map<Integer, TagTreeVo> tagMap = keyTagList.stream().collect(Collectors.toMap(TagTreeVo::getId, (v)-> v));
+
+        //根据tag_id 获取具体的tag关键信息
+        questionList.forEach(v -> {
+            String[] split = v.getTagIds().split(",");
+            List<TagTreeVo> list1 = new ArrayList<>();
+            for (String s : split) {
+                TagTreeVo tagTreeVo = tagMap.get(Integer.parseInt(s));
+                if(Objects.nonNull(tagTreeVo)){
+                    list1.add(tagTreeVo);
+                }
+            }
+            v.setTagList(list1);
+        });
+
+        return questionList;
+    }
+
+    /**
+     * 根据关键字获取问答列表
+     * @param key 关键字
+     * @param page 当前页
+     * @return 问答列表
+     */
+    @Override
+    public List<QuestionShowVo> getQuestionShowByKey(String key, Integer page) {
+        if(page == null || page < 1){
+            page = 1;
+        }
+
+        //获取用户发表的问答列表
+        List<QuestionShowVo> questionList = questionMapper.getUserQuestionShowList(null,(page - 1) * 10,'%'+key+'%',null);
+
+        if (questionList.size() == 0){
+            return questionList;
+        }
+
+        //获取tag标签关键信息
+        List<TagTreeVo> keyTagList = tagService.getKeyTagList();
+        //转为map集合，加快查询速度
+        Map<Integer, TagTreeVo> tagMap = keyTagList.stream().collect(Collectors.toMap(TagTreeVo::getId, (v)-> v));
+
+        //根据tag_id 获取具体的tag关键信息
+        questionList.forEach(v -> {
+            String[] split = v.getTagIds().split(",");
+            List<TagTreeVo> list1 = new ArrayList<>();
+            for (String s : split) {
+                TagTreeVo tagTreeVo = tagMap.get(Integer.parseInt(s));
+                if(Objects.nonNull(tagTreeVo)){
+                    list1.add(tagTreeVo);
+                }
+            }
+            v.setTagList(list1);
+        });
+
+        return questionList;
+    }
+
+    /**
+     * 根据标签id 获取问答列表
+     * @param id 标签id
+     * @param page 当前页
+     * @return 搜索结果
+     */
+    @Override
+    public List<QuestionShowVo> getQuestionShowByTagId(Integer id, Integer page) {
+        if(page == null || page < 1){
+            page = 1;
+        }
+
+        //获取用户发表的问答列表
+        List<QuestionShowVo> questionList = questionMapper.getUserQuestionShowList(null,(page - 1) * 10,null,id);
+
+        if (questionList.size() == 0){
+            return questionList;
+        }
+
+        //获取tag标签关键信息
+        List<TagTreeVo> keyTagList = tagService.getKeyTagList();
+        //转为map集合，加快查询速度
+        Map<Integer, TagTreeVo> tagMap = keyTagList.stream().collect(Collectors.toMap(TagTreeVo::getId, (v)-> v));
+
+        //根据tag_id 获取具体的tag关键信息
+        questionList.forEach(v -> {
+            String[] split = v.getTagIds().split(",");
+            List<TagTreeVo> list1 = new ArrayList<>();
+            for (String s : split) {
+                TagTreeVo tagTreeVo = tagMap.get(Integer.parseInt(s));
+                if(Objects.nonNull(tagTreeVo)){
+                    list1.add(tagTreeVo);
+                }
+            }
+            v.setTagList(list1);
+        });
+
+        return questionList;
     }
 }
