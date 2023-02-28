@@ -3,11 +3,13 @@ package com.kerco.kkc.community.service.impl;
 import com.kerco.kkc.common.entity.UserKeyTo;
 import com.kerco.kkc.common.utils.CommonResult;
 import com.kerco.kkc.community.entity.ArticleComment;
+import com.kerco.kkc.community.entity.Message;
 import com.kerco.kkc.community.entity.QuestionComment;
 import com.kerco.kkc.community.entity.vo.CommentVo;
 import com.kerco.kkc.community.entity.vo.PostCommentVo;
 import com.kerco.kkc.community.feign.MemberFeign;
 import com.kerco.kkc.community.mapper.QuestionCommentMapper;
+import com.kerco.kkc.community.service.MessageService;
 import com.kerco.kkc.community.service.QuestionCommentService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.beans.BeanUtils;
@@ -36,6 +38,9 @@ public class QuestionCommentServiceImpl extends ServiceImpl<QuestionCommentMappe
 
     @Autowired
     private MemberFeign memberFeign;
+
+    @Autowired
+    private MessageService messageService;
 
     /**
      * 根据问答id 获取问答的评论列表
@@ -119,6 +124,26 @@ public class QuestionCommentServiceImpl extends ServiceImpl<QuestionCommentMappe
         int i = questionCommentMapper.postComment(questionComment);
         if(i == 0){
             throw new RuntimeException("评论出现异常...");
+        }else{
+            //TODO 在这里实现 用户评论消息
+            //思路
+            //1.使用rabbitmq的消息机制 添加消息
+            //2.开启异步任务 添加消息
+            Message message = new Message();
+            //运行到这边就说明评论已经加入到数据库了，所以直接判断即可
+            if(Objects.isNull(postCommentVo.getParentId()) && Objects.isNull(postCommentVo.getReplyId())){
+                //如果是一级评论，则消息的接收是 文章作者id
+                message.setOptOperation(1);
+            }else{
+                message.setOptOperation(2);
+                //如果是二级评论，则消息的接收是 一级评论的用户id
+                message.setUserId(postCommentVo.getReplyId());
+            }
+            message.setOptType(1);
+            message.setOptId(postCommentVo.getId());
+            message.setClientId(postCommentVo.getCommentId());
+
+            messageService.acceptQuestionCommentMessage(message);
         }
     }
 }

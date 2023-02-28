@@ -9,8 +9,6 @@ public class ArticleShowVo extends CurrencyShowVo{
 
     private String firstImg;
 
-    private Integer thumbsup;
-
     private Integer official;
 
     private Integer top;

@@ -2,6 +2,7 @@ package com.kerco.kkc.community.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.kerco.kkc.common.constant.RedisConstant;
 import com.kerco.kkc.common.entity.UserTo;
 import com.kerco.kkc.common.utils.CommonResult;
 import com.kerco.kkc.common.utils.JwtUtils;
@@ -10,15 +11,16 @@ import com.kerco.kkc.community.entity.Question;
 import com.kerco.kkc.community.entity.to.User;
 import com.kerco.kkc.community.entity.vo.*;
 import com.kerco.kkc.community.feign.MemberFeign;
+import com.kerco.kkc.community.interceptor.LoginInterceptor;
 import com.kerco.kkc.community.mapper.ArticleMapper;
-import com.kerco.kkc.community.service.ArticleContentService;
-import com.kerco.kkc.community.service.ArticleService;
+import com.kerco.kkc.community.service.*;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.kerco.kkc.community.service.CategoryService;
-import com.kerco.kkc.community.service.TagService;
 import com.kerco.kkc.community.utils.PageUtils;
+import org.apache.logging.log4j.util.Strings;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -59,6 +61,15 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
 
     @Autowired
     private CategoryService categoryService;
+
+    @Autowired
+    private ArticleStarService articleStarService;
+
+    @Autowired
+    private StringRedisTemplate redisTemplate;
+
+    @Autowired
+    private ThreadPoolExecutor threadPoolExecutor;
 
     /**
      * 分页 获取文章列表
@@ -158,7 +169,10 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
      */
     @Override
     public int deleteArticleById(Long id) {
-        return articleMapper.deleteArticleById(id);
+        Article article = new Article();
+        article.setId(id);
+
+        return articleMapper.deleteArticleById(article);
     }
 
     /**
@@ -171,8 +185,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
     @Transactional
     @Override
     public void writeArticle(ArticleWriteVo articleWriteVo, HttpServletRequest request) throws ExecutionException, InterruptedException {
-        String token = request.getHeader("token");
-        Map<String, Object> userData = JwtUtils.getPayLoadALSOExcludeExpAndIat(token);
+        Map<String, Object> userData = LoginInterceptor._toThreadLocal.get();
         //1.验证token里的id与作者id是否一致
         if(Long.parseLong(userData.get("id").toString()) == articleWriteVo.getAuthorId()){
             //2.获取用户最新的信息
@@ -187,6 +200,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
                 return tagService.incrRefCount(articleWriteVo.getCategoryId(), articleWriteVo.getTagIds());
             }, poolExecutor);
 
+            //TODO 缺少对分类的id进行验证
             UserTo user1 = result.getData();
             if(countFuture.get() > 0){
                 Article article = new Article();
@@ -340,7 +354,35 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
     public ArticleShowVo getArticleShowById(Long id) {
         //增加浏览文章次数
         articleMapper.incrArticleCount(id);
-        return articleMapper.getArticleShowById(id);
+
+        int count = -1;
+
+        if(!redisTemplate.hasKey(RedisConstant.ARTICLE_THUMBSUP_COUNT+id)){
+            //开启异步处理
+            CompletableFuture.runAsync(()->{
+                //如果没在redis中存储过，则将id存储到redis中
+                //TODO 待优化 点赞用户id的存储结构
+                List<String> userIds = articleStarService.getUserThumbsUpIdByArticleId(id);
+                userIds.forEach(userId -> {
+                    redisTemplate.opsForSet().add(RedisConstant.THUMBSUP_ARTICLE_USERID_LIST+id,userId);
+                });
+
+                //保存点赞数量
+                Integer currentCount = articleStarService.getUserThumbsCountByArticleId(id);
+                redisTemplate.opsForValue().set(RedisConstant.ARTICLE_THUMBSUP_COUNT+id, currentCount+"");
+            },threadPoolExecutor);
+        }else{
+            //从缓存中获取点赞数
+            String s = redisTemplate.opsForValue().get(RedisConstant.ARTICLE_THUMBSUP_COUNT + id);
+            count = Integer.parseInt(s == null ? "0" : s);
+        }
+
+        ArticleShowVo articleShowById = articleMapper.getArticleShowById(id);
+        if(count != -1){
+            articleShowById.setThumbsup(count);
+        }
+
+        return articleShowById;
     }
 
     /**
@@ -467,5 +509,103 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
         });
 
         return articleList;
+    }
+
+    /**
+     * 随机获取缓存中5个保存的文章 缓存中存储100个最新文章
+     * @return 随机文章列表
+     */
+    @Override
+    public List<CurrencyShowVo> randomArticleShow() {
+        return articleMapper.randomArticleShow();
+    }
+
+    /**
+     * 删除文章
+     * @param id 文章id
+     * @return 删除结果
+     */
+    @Override
+    public int deleteArticle(Long id) {
+        Map<String, Object> userInfo = LoginInterceptor._toThreadLocal.get();
+        Long userId = Long.parseLong(userInfo.get("id").toString());
+        //删除前查询一下 文章是否存在
+        Article article = this.getArticleById(id);
+        //如果文章不为空，同时文章作者id 与当前登陆的id相同，则删除
+        if(Objects.nonNull(article) && userId.equals(article.getAuthorId())){
+            return this.deleteArticleById(id);
+        }
+        return 0;
+    }
+
+    /**
+     * 获取编辑文章
+     * @param map 接收要修改的文章id
+     * @return 文章内容
+     */
+    @Override
+    public CurrencyShowVo getEditArticle(Map<String, String> map) {
+        //先从请求体中获取文章id
+        Long articleId = Long.parseLong(map.get("id"));
+        //获取文章展示信息
+        ArticleShowVo article = articleMapper.getArticleShowById(articleId);
+        //从token中获取用户信息，取出用户id
+        Map<String, Object> userInfo = LoginInterceptor._toThreadLocal.get();
+        Long userId = Long.parseLong(userInfo.get("id").toString());
+        //如果用户id与文章的作者id相同，才允许返回内容
+        if(userId.equals(article.getAuthorId())){
+            return article;
+        }
+
+        return null;
+    }
+
+    /**
+     * 修改文章
+     * @param articleEditVo 要修改的文章信息
+     * @return 修改结果
+     */
+    @Transactional
+    @Override
+    public int renewArticle(ArticleEditVo articleEditVo) {
+        Map<String, Object> userInfo = LoginInterceptor._toThreadLocal.get();
+        Long userId = Long.parseLong(userInfo.get("id").toString());
+
+        //判断登陆的用户id 与文章的作者id是否一致
+        if(userId.equals(articleEditVo.getAuthorId())){
+            //文章信息
+            Article article = new Article();
+            article.setId(articleEditVo.getId());
+            article.setTitle(articleEditVo.getTitle());
+            article.setAuthorId(articleEditVo.getAuthorId());
+            //重新将审核状态进行重置，文章编辑之后需要重新审核
+            article.setExamination(0);
+            String tagList = String.join(",", articleEditVo.getTagIds().stream().map(v -> String.valueOf(v)).collect(Collectors.toList()));
+            article.setTagIds(tagList);
+
+            int result = articleMapper.renewArticle(article);
+            int result2 = articleContentService.renewArticleContent(articleEditVo.getId(), articleEditVo.getContent());
+            if(result == 1 && result2 == 1){
+                return 1;
+            }else{
+                throw new IllegalArgumentException("更新文章异常");
+            }
+        }
+        return 0;
+    }
+
+    /**
+     * 定时更新 文章表里面的点赞数
+     */
+    @Override
+    public void fixedTimeUpdateThumbsUp() {
+        //匹配所有在redis中存储的key，已 article:thumbsup:count: 为前缀
+        Set<String> keys = redisTemplate.keys(RedisConstant.ARTICLE_THUMBSUP_COUNT + "*");
+        ValueOperations<String, String> operations = redisTemplate.opsForValue();
+        for (String key : keys) {
+            Integer count = Integer.parseInt(operations.get(key));
+            String id = key.substring(key.lastIndexOf(":")+1);
+            articleMapper.fixedTimeUpdateThumbsUp(Long.parseLong(id),count);
+        }
     }
 }

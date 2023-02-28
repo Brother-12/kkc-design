@@ -5,6 +5,7 @@ import com.kerco.kkc.common.utils.CommonResult;
 import com.kerco.kkc.member.entity.vo.UserAuthVo;
 import com.kerco.kkc.member.entity.vo.UserRegisterVo;
 import com.kerco.kkc.member.service.AccessService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.FastByteArrayOutputStream;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,10 +27,10 @@ import java.util.Map;
 @RequestMapping("/access")
 public class AccessController {
 
-    @Resource
+    @Autowired
     private AccessService accessService;
 
-    @Resource
+    @Autowired
     private Producer producer;
 
     /**
@@ -102,5 +103,20 @@ public class AccessController {
         Map<String,Object> result = accessService.getUserInfo(request);
 
         return CommonResult.success(result);
+    }
+
+    /**
+     * 管理员登录
+     * @param userAuthVo
+     * @return
+     */
+    @PostMapping("/login/admin111")
+    public CommonResult adminLogin(@RequestBody UserAuthVo userAuthVo,HttpServletResponse response){
+        String token = accessService.adminLogin(userAuthVo);
+
+        response.setHeader("Access-Control-Expose-Headers","accessKey");
+        response.setHeader("accessKey",token);
+
+        return CommonResult.success("登录成功");
     }
 }

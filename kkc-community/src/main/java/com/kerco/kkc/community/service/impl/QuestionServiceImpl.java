@@ -2,6 +2,7 @@ package com.kerco.kkc.community.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.kerco.kkc.common.constant.RedisConstant;
 import com.kerco.kkc.common.entity.UserTo;
 import com.kerco.kkc.common.utils.CommonResult;
 import com.kerco.kkc.common.utils.JwtUtils;
@@ -9,15 +10,15 @@ import com.kerco.kkc.community.entity.Article;
 import com.kerco.kkc.community.entity.Question;
 import com.kerco.kkc.community.entity.vo.*;
 import com.kerco.kkc.community.feign.MemberFeign;
+import com.kerco.kkc.community.interceptor.LoginInterceptor;
 import com.kerco.kkc.community.mapper.QuestionMapper;
-import com.kerco.kkc.community.service.CategoryService;
-import com.kerco.kkc.community.service.QuestionContentService;
-import com.kerco.kkc.community.service.QuestionService;
+import com.kerco.kkc.community.service.*;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.kerco.kkc.community.service.TagService;
 import com.kerco.kkc.community.utils.PageUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.SetOperations;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -57,6 +58,15 @@ public class QuestionServiceImpl extends ServiceImpl<QuestionMapper, Question> i
 
     @Autowired
     private CategoryService categoryService;
+
+    @Autowired
+    private StringRedisTemplate redisTemplate;
+
+    @Autowired
+    private QuestionStarService questionStarService;
+
+    @Autowired
+    private ThreadPoolExecutor threadPoolExecutor;
 
     @Override
     public PageUtils getQuestionList(Integer currentPage, String key, Integer examination,Integer status) {
@@ -314,7 +324,38 @@ public class QuestionServiceImpl extends ServiceImpl<QuestionMapper, Question> i
     @Override
     public QuestionShowVo getQuestionShowById(Long id) {
         questionMapper.incrQuestionCount(id);
-        return questionMapper.getQuestionShowById(id);
+
+        int count = -1;
+        //判断redis中是否有存储该问答 用户点赞id集合
+        if(!redisTemplate.hasKey(RedisConstant.THUMBSUP_QUESTION_USERID_LIST + id)){
+            //如果没有则开启异步进行处理
+            CompletableFuture.runAsync(()-> {
+                //获取所有点赞用户id，包括取消点赞的
+                List<String> userIds = questionStarService.getUserThumbsUpIdByQuestionId(id);
+                SetOperations<String, String> setOptions = redisTemplate.opsForSet();
+                userIds.forEach(userId -> {
+                    //保存到redis的set集合中
+                    setOptions.add(RedisConstant.THUMBSUP_QUESTION_USERID_LIST + id,userId);
+                });
+
+                //再次获取点赞用户信息，确定当前的数量
+                Integer currentCount = questionStarService.getUserThumbsUpCount(id);
+                //添加到缓存中
+                redisTemplate.opsForValue().set(RedisConstant.QUESTION_THUMBSUP_COUNT+id,currentCount.toString());
+            },threadPoolExecutor);
+        }else{
+            //如果有保存过用户点赞id集合，则直接获取缓存中保存的点赞数
+            String s = redisTemplate.opsForValue().get(RedisConstant.QUESTION_THUMBSUP_COUNT + id);
+            //真实的点赞数
+            count = Integer.parseInt(s);
+        }
+        QuestionShowVo questionShowById = questionMapper.getQuestionShowById(id);
+
+        if(count != -1){
+            questionShowById.setThumbsup(count);
+        }
+
+        return questionShowById;
     }
 
     /**
@@ -431,5 +472,32 @@ public class QuestionServiceImpl extends ServiceImpl<QuestionMapper, Question> i
         });
 
         return questionList;
+    }
+
+    /**
+     * 获取随机问答列表
+     * @return 问答列表
+     */
+    @Override
+    public List<CurrencyShowVo> randomQuestionShow() {
+        return questionMapper.randomQuestionShow();
+    }
+
+    /**
+     * 删除问答
+     * @param id 问答id
+     * @return 删除结果
+     */
+    @Override
+    public int deleteQuestion(Long id) {
+        Map<String, Object> userInfo = LoginInterceptor._toThreadLocal.get();
+        Long userId = Long.parseLong(userInfo.get("id").toString());
+        //删除前查询一下 问答是否存在
+        Question question = this.getQuestionById(id);
+        //如果问答不为空，同时问答作者id 与当前登陆的id相同，则删除
+        if(Objects.nonNull(question) && userId.equals(question.getAuthorId())){
+            return this.deleteQuestionById(id);
+        }
+        return 0;
     }
 }

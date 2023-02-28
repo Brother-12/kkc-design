@@ -71,4 +71,39 @@ public class ArticleContentServiceImpl extends ServiceImpl<ArticleContentMapper,
             System.out.println("保存成功");
         }
     }
+
+    /**
+     * 修改文章内容
+     * @param id 文章id
+     * @param content 文章内容
+     */
+    @Override
+    public int renewArticleContent(Long id, String content) {
+        ArticleContent content1 = new ArticleContent();
+        content1.setMdContent(content);
+        content1.setId(id);
+
+        //第一张图片处理
+        String regex = "https://kkc-picture.oss-cn-shenzhen.aliyuncs.com/(.*?)(\\.jpg|\\.jpeg|\\.png)";
+        Pattern p = Pattern.compile(regex);
+        Matcher ma = p.matcher(content);
+
+        //如果该文章内有图片，则
+        if(ma.find()){
+            content1.setFirstImg(ma.group());
+        }
+
+        //文本处理
+        String regexs = "(#|>|\\*\\*|`| |!\\[.*?\\]|\\(https.*?\\))";
+        Pattern compile = Pattern.compile(regexs);
+        Matcher matcher = compile.matcher(content);
+        //处理md文档的所有特殊符号，只保留文本
+        if(matcher.find()){
+            content1.setParseContent(matcher.replaceAll(""));
+        }else{
+            content1.setParseContent(content);
+        }
+
+        return contentMapper.renewArticleContent(content1);
+    }
 }

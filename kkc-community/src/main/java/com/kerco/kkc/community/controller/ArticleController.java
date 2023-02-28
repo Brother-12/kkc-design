@@ -11,6 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.stereotype.Controller;
 
+import java.util.Set;
+
 /**
  * <p>
  *  前端控制器
@@ -100,5 +102,16 @@ public class ArticleController {
         int result = articleService.deleteArticleById(id);
 
         return CommonResult.success(result);
+    }
+
+    /**
+     * 定时更新 文章表里面的点赞数
+     * @return 执行结果
+     */
+    @PostMapping("/fixed/update/thumbsUp")
+    public CommonResult fixedTimeUpdateThumbsUp(){
+        articleService.fixedTimeUpdateThumbsUp();
+
+        return CommonResult.success();
     }
 }

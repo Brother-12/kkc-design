@@ -30,4 +30,11 @@ public interface AccessService {
      * @param userRegisterVo 待注册的信息
      */
     String registerUser(UserRegisterVo userRegisterVo);
+
+    /**
+     * 管理员登录
+     * @param userAuthVo 用户名、密码
+     * @return token
+     */
+    String adminLogin(UserAuthVo userAuthVo);
 }

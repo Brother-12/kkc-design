@@ -8,7 +8,7 @@
     </update>
 
     <update id="deleteQuestionById">
-        update community_question set status = 2,update_time = #{updateTime}
+        update community_question set status = 2,update_time = CURRENT_TIMESTAMP()
         where id = #{id};
     </update>
 
@@ -86,5 +86,18 @@
         <if test="key != null">and title like #{key}</if>
         <if test="tagId != null">and tag_ids regexp '(${tagId})'</if>
         limit #{page},10;
+    </select>
+
+    <select id="randomQuestionShow" resultType="com.kerco.kkc.community.entity.vo.CurrencyShowVo">
+        SELECT sh1.* FROM community_question AS sh1
+                              JOIN
+                          (SELECT
+                               ROUND(
+                                               RAND() * ((SELECT MAX(id) FROM community_question)-(SELECT MIN(id) FROM community_question))
+                                           + (SELECT MIN(id) FROM community_question)
+                                   ) AS share_id
+                          ) AS sh2
+        WHERE sh1.id>=sh2.share_id and status = 0
+        order by sh1.id limit 5;
     </select>
 </mapper>

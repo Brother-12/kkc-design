@@ -76,7 +76,7 @@
     </select>
 
     <select id="getArticleShowById" resultType="com.kerco.kkc.community.entity.vo.ArticleShowVo">
-        select a.id,title,author_id,author_avatar,author_username,thumbsup,views,create_time "publishTime",md_content content
+        select a.id,title,author_id,author_avatar,author_username,thumbsup,tag_ids,views,create_time "publishTime",md_content content
         from community_article a
                  inner join community_article_content c on a.id = c.id
         where a.examination = 1 and status = 0 and a.id = #{id};
@@ -85,4 +85,28 @@
     <select id="getArticleListById" resultType="com.kerco.kkc.community.entity.Article">
         select * from community_article where author_id = #{id};
     </select>
+
+<!--    高效率随机获取数据-->
+    <select id="randomArticleShow" resultType="com.kerco.kkc.community.entity.vo.CurrencyShowVo">
+        SELECT sh1.* FROM community_article AS sh1
+                              JOIN
+                          (SELECT
+                               ROUND(
+                                               RAND() * ((SELECT MAX(id) FROM community_article)-(SELECT MIN(id) FROM community_article))
+                                           + (SELECT MIN(id) FROM community_article)
+                                   ) AS share_id
+                          ) AS sh2
+        WHERE sh1.id>=sh2.share_id and status = 0
+        order by sh1.id limit 5;
+    </select>
+
+    <update id="renewArticle">
+        update community_article set title = #{title},tag_ids = #{tagIds},update_time = #{updateTime},examination = #{examination}
+        where id = #{id} and author_id = #{authorId};
+    </update>
+
+    <update id="fixedTimeUpdateThumbsUp">
+        update community_article set thumbsup = #{thumbsup}
+        where id = #{id};
+    </update>
 </mapper>

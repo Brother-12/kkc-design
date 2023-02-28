@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.kerco.kkc.community.mapper.QuestionStarMapper">
+
+    <select id="getUserThumbsUpIdByQuestionId" resultType="string">
+        select user_id from community_question_star
+        where question_id = #{id};
+    </select>
+
+    <select id="getUserThumbsUpStatus" resultType="int">
+        select status from community_question_star
+        where question_id = #{questionId} and user_id = #{userId};
+    </select>
+
+    <insert id="questionThumbsUp" parameterType="com.kerco.kkc.community.entity.QuestionStar">
+        insert into community_question_star(question_id,user_id,create_time,update_time)
+        values(#{questionId},#{userId},CURRENT_TIMESTAMP(),CURRENT_TIMESTAMP());
+    </insert>
+
+    <update id="updateThumbsUpStatus">
+        update community_question_star set status = #{status}
+        where question_id = #{questionId} and user_id = #{userId};
+    </update>
+
+    <select id="getUserThumbsUpCount" resultType="int">
+        select count(1) from community_question_star
+        where question_id = #{id} and status = 0;
+    </select>
+</mapper>

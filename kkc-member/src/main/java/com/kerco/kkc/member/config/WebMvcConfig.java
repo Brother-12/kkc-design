@@ -27,6 +27,8 @@ public class WebMvcConfig implements WebMvcConfigurer {
                 "/access/code",
                 //注册
                 "/access/register",
+                //管理员登录
+                "/access/login/admin111",
                 //获取评论的用户信息
                 "/member/user/getUserList",
                 //获取用户的简单信息

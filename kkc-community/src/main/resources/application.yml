@@ -17,8 +17,11 @@ spring:
     nacos:
       discovery:
         server-addr: 127.0.0.1
-  jackson:
-    default-property-inclusion: NON_EMPTY
+
+  redis:
+    host: 192.168.250.20
+    port: 6379
+
 mybatis-plus:
   mapper-locations: classpath:/mapper/**/*.xml
 logging:

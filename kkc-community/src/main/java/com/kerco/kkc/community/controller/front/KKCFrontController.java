@@ -6,6 +6,7 @@ import com.kerco.kkc.community.entity.vo.*;
 import com.kerco.kkc.community.service.*;
 import com.kerco.kkc.community.utils.PageUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.NumberFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -43,6 +44,10 @@ public class KKCFrontController {
     @Autowired
     private SearchService searchService;
 
+    /**
+     * 获取分类节点
+     * @return 分类节点列表
+     */
     @GetMapping("/category/treeList")
     public CommonResult getCategoryTreeList(){
         List<CategoryTreeVo> categoryTree = categoryService.getCategoryTree();
@@ -109,6 +114,11 @@ public class KKCFrontController {
         return CommonResult.success(result);
     }
 
+    /**
+     * 获取文章详细页
+     * @param id 文章id
+     * @return 文章详细页
+     */
     @GetMapping("/article/detail")
     public CommonResult getArticleById(@RequestParam("id") Long id){
         ArticleShowVo articleShowVo = articleService.getArticleShowById(id);
@@ -116,6 +126,13 @@ public class KKCFrontController {
         return CommonResult.success(articleShowVo);
     }
 
+    /**
+     * 获取用户的成就
+     * @param id 用户id
+     * @return 用户的成就信息
+     * @throws ExecutionException
+     * @throws InterruptedException
+     */
     @GetMapping("/user/achievement")
     public CommonResult getUserAchievement(@RequestParam("id") Long id) throws ExecutionException, InterruptedException {
         UserAchievementVo userAchievementVo = achievementService.getUserAchievement(id);
@@ -186,6 +203,14 @@ public class KKCFrontController {
         return CommonResult.success(result);
     }
 
+    /**
+     * 搜索接口 - 根据关键字搜索
+     * @param page 页数
+     * @param key 关键字
+     * @return 搜索结果分页
+     * @throws ExecutionException
+     * @throws InterruptedException
+     */
     @GetMapping("/search")
     public CommonResult searchKey(@RequestParam(value = "currentPage",required = false) Integer page,
                                   @RequestParam("key") String key) throws ExecutionException, InterruptedException {
@@ -194,11 +219,43 @@ public class KKCFrontController {
         return CommonResult.success(stringObjectMap);
     }
 
+    /**
+     * 搜索接口 - 根据标签搜索
+     * @param page 页数
+     * @param id 标签id
+     * @return 搜索结果分页
+     * @throws ExecutionException
+     * @throws InterruptedException
+     */
     @GetMapping("/tag/search")
     public CommonResult searchTag(@RequestParam(value = "currentPage",required = false) Integer page,
                                   @RequestParam("id") Integer id) throws ExecutionException, InterruptedException {
         Map<String, Object> stringObjectMap = searchService.searchTag(id, page);
 
         return CommonResult.success(stringObjectMap);
+    }
+
+    /**
+     * 获取随机文章列表
+     * @return 文章列表
+     */
+    @GetMapping("/random/article")
+    public CommonResult randomArticleShow(){
+
+        List<CurrencyShowVo> currencyShowVoList = articleService.randomArticleShow();
+
+        return CommonResult.success(currencyShowVoList);
+    }
+
+    /**
+     * 获取随机问答列表
+     * @return 问答列表
+     */
+    @GetMapping("/random/question")
+    public CommonResult randomQuestionShow(){
+
+        List<CurrencyShowVo> currencyShowVoList = questionService.randomQuestionShow();
+
+        return CommonResult.success(currencyShowVoList);
     }
 }

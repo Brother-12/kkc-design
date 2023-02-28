@@ -1,8 +1,10 @@
 package com.kerco.kkc.member.service;
 
 import com.kerco.kkc.common.entity.UserKeyTo;
+import com.kerco.kkc.member.entity.Role;
 import com.kerco.kkc.member.entity.User;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.kerco.kkc.member.entity.UserRole;
 import com.kerco.kkc.member.entity.vo.UserDetailVo;
 import com.kerco.kkc.member.entity.vo.UserInfoVo;
 import com.kerco.kkc.member.entity.vo.UserSimpleShowVo;
@@ -104,4 +106,11 @@ public interface UserService extends IService<User> {
      * @return 修改结果
      */
     int updateUserDetail(UserSimpleShowVo userSimpleShowVo,HttpServletRequest request);
+
+    /**
+     * 获取角色信息
+     * @param id 用户id
+     * @return 角色信息
+     */
+    UserRole getRole(Long id);
 }

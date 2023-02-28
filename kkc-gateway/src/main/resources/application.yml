@@ -16,7 +16,7 @@ spring:
         - id: kkc-community
           uri: lb://kkc-community
           predicates:
-            - Path=/community/**,/kkc/**,/write/**,/post/**
+            - Path=/community/**,/kkc/**,/write/**,/post/**,/message/**
         - id: kkc-picture
           uri: lb://kkc-picture
           predicates:

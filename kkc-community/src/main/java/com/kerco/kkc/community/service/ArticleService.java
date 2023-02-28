@@ -2,16 +2,14 @@ package com.kerco.kkc.community.service;
 
 import com.kerco.kkc.community.entity.Article;
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.kerco.kkc.community.entity.vo.ArticleShowVo;
-import com.kerco.kkc.community.entity.vo.ArticleWriteVo;
-import com.kerco.kkc.community.entity.vo.PostCommentVo;
-import com.kerco.kkc.community.entity.vo.QuestionWriteVo;
+import com.kerco.kkc.community.entity.vo.*;
 import com.kerco.kkc.community.utils.PageUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
 
 /**
@@ -111,4 +109,36 @@ public interface ArticleService extends IService<Article> {
      * @return 搜索结果
      */
     List<ArticleShowVo> getArticleShowByTagId(Integer id, Integer page);
+
+    /**
+     * 随机获取缓存中5个保存的文章 缓存中存储100个最新文章
+     * @return 随机文章列表
+     */
+    List<CurrencyShowVo> randomArticleShow();
+
+    /**
+     * 删除文章
+     * @param id 文章id
+     * @return 删除结果
+     */
+    int deleteArticle(Long id);
+
+    /**
+     * 获取编辑文章
+     * @param map 接收要修改的文章id
+     * @return 文章内容
+     */
+    CurrencyShowVo getEditArticle(Map<String, String> map);
+
+    /**
+     * 修改文章
+     * @param articleEditVo 要修改的文章信息
+     * @return 修改结果
+     */
+    int renewArticle(ArticleEditVo articleEditVo);
+
+    /**
+     * 定时更新 文章表里面的点赞数
+     */
+    void fixedTimeUpdateThumbsUp();
 }

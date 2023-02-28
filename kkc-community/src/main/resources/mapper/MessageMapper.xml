@@ -6,4 +6,11 @@
         insert into community_message(client_id,client_username,client_avatar,user_id,opt_operation,opt_type,opt_id,opt_title,create_time,update_time)
         values(#{clientId},#{clientUsername},#{clientAvatar},#{userId},#{optOperation},#{optType},#{optId},#{optTitle},#{createTime},#{updateTime});
     </insert>
+
+    <select id="getMessage" resultType="com.kerco.kkc.community.entity.vo.MessageVo">
+        select id,client_id,client_username,client_avatar,opt_type,opt_operation,opt_id,opt_title,mark
+        from community_message where user_id = #{userId} and status = 0
+        order by create_time desc
+        limit #{page},10;
+    </select>
 </mapper>

@@ -69,4 +69,9 @@
         update member_user set avatar = #{avatar},sex = #{sex},summary = #{summary},update_time = #{updateTime}
         where id = #{id};
     </update>
+
+    <select id="getRole" resultType="com.kerco.kkc.member.entity.UserRole">
+        select id,user_id,role_id from member_user_role
+        where role_id = (select id from member_role where name = 'admin') and user_id = #{id};
+    </select>
 </mapper>

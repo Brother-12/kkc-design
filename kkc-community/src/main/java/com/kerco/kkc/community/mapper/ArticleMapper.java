@@ -32,10 +32,10 @@ public interface ArticleMapper extends BaseMapper<Article> {
 
     /**
      * 根据id删除文章
-     * @param id 文章id
+     * @param article 文章
      * @return 删除结果
      */
-    int deleteArticleById(Long id);
+    int deleteArticleById(Article article);
 
     /**
      * 创建文章
@@ -86,4 +86,24 @@ public interface ArticleMapper extends BaseMapper<Article> {
      * @param id 文章id
      */
     void incrArticleCount(@Param("id") Long id);
+
+    /**
+     * 获取100个最新的文章列表
+     * @return 文章列表
+     */
+    List<CurrencyShowVo> randomArticleShow();
+
+    /**
+     * 修改文章
+     * @param article 文章信息
+     * @return 修改结果
+     */
+    int renewArticle(Article article);
+
+    /**
+     * 刷新点赞数量
+     * @param id 文章id
+     * @param count 点赞数量
+     */
+    int fixedTimeUpdateThumbsUp(@Param("id") Long id, @Param("thumbsup") Integer count);
 }

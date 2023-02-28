@@ -5,7 +5,9 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.google.common.base.Strings;
 import com.kerco.kkc.common.entity.UserKeyTo;
 import com.kerco.kkc.common.utils.JwtUtils;
+import com.kerco.kkc.member.entity.Role;
 import com.kerco.kkc.member.entity.User;
+import com.kerco.kkc.member.entity.UserRole;
 import com.kerco.kkc.member.entity.qo.CountQo;
 import com.kerco.kkc.member.entity.vo.UserDetailVo;
 import com.kerco.kkc.member.entity.vo.UserInfoVo;
@@ -209,6 +211,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
      */
     @Override
     public int updateUserDetail(UserSimpleShowVo userSimpleShowVo,HttpServletRequest request) {
+		//TODO 在拦截器中获取ThreadLocal保存的User信息
+    
         //从请求头中获取token
         String token = request.getHeader("token");
         //从token中获取用户信息
@@ -225,5 +229,15 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         }
 
         throw new RuntimeException("用户操作异常....");
+    }
+
+    /**
+     * 获取角色信息
+     * @param id 用户id
+     * @return 角色信息
+     */
+    @Override
+    public UserRole getRole(Long id) {
+        return userMapper.getRole(id);
     }
 }

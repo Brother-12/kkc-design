@@ -16,4 +16,10 @@ import org.apache.ibatis.annotations.Mapper;
 public interface ArticleContentMapper extends BaseMapper<ArticleContent> {
 
     int saveArticleContent(ArticleContent content1);
+
+    /**
+     * 修改文章内容
+     * @param content1 文章文本内容
+     */
+    int renewArticleContent(ArticleContent content1);
 }

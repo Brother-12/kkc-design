@@ -1,5 +1,6 @@
 package com.kerco.kkc.community.service;
 
+import com.kerco.kkc.community.entity.Article;
 import com.kerco.kkc.community.entity.ArticleContent;
 import com.baomidou.mybatisplus.extension.service.IService;
 
@@ -26,4 +27,12 @@ public interface ArticleContentService extends IService<ArticleContent> {
      * @param content 文章内容
      */
     void saveArticleContent(Long id, String content);
+
+    /**
+     * 修改文章文本
+     * @param id 文章id
+     * @param content 文章内容
+     * @return 修改结果
+     */
+    int renewArticleContent(Long id, String content);
 }

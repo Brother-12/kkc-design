@@ -2,6 +2,7 @@ package com.kerco.kkc.community.service;
 
 import com.kerco.kkc.community.entity.Question;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.kerco.kkc.community.entity.vo.CurrencyShowVo;
 import com.kerco.kkc.community.entity.vo.QuestionShowVo;
 import com.kerco.kkc.community.entity.vo.QuestionWriteVo;
 import com.kerco.kkc.community.utils.PageUtils;
@@ -110,4 +111,17 @@ public interface QuestionService extends IService<Question> {
      * @return 搜索结果
      */
     List<QuestionShowVo> getQuestionShowByTagId(Integer id, Integer page);
+
+    /**
+     * 获取随机问答列表
+     * @return 问答列表
+     */
+    List<CurrencyShowVo> randomQuestionShow();
+
+    /**
+     * 删除问答
+     * @param id 问答id
+     * @return 删除结果
+     */
+    int deleteQuestion(Long id);
 }

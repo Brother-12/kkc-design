@@ -1,8 +1,10 @@
 package com.kerco.kkc.member.mapper;
 
 import com.kerco.kkc.common.entity.UserKeyTo;
+import com.kerco.kkc.member.entity.Role;
 import com.kerco.kkc.member.entity.User;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.kerco.kkc.member.entity.UserRole;
 import com.kerco.kkc.member.entity.qo.CountQo;
 import com.kerco.kkc.member.entity.vo.UserDetailVo;
 import com.kerco.kkc.member.entity.vo.UserInfoVo;
@@ -109,4 +111,11 @@ public interface UserMapper extends BaseMapper<User> {
      * @return 修改结果
      */
     int updateUserInfoByUser(User user);
+
+    /**
+     * 获取角色信息
+     * @param id 用户id
+     * @return 角色信息
+     */
+    UserRole getRole(Long id);
 }

@@ -68,4 +68,33 @@ class CodeGenerateApplicationTests {
                 .templateEngine(new FreemarkerTemplateEngine()) // 使用Freemarker引擎模板，默认的是Velocity引擎模板
                 .execute();
     }
+
+    /**
+     * 生成kkc_community 源码
+     */
+    @Test
+    void contextLoads3() {
+        FastAutoGenerator.create("jdbc:mysql://192.168.250.20:3306/kkc_community?useSSL=false&useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai", "root", "123456")
+                .globalConfig(builder -> {
+                    builder.author("kerco") // 设置作者
+                            .enableSwagger() // 开启 swagger 模式
+                            .fileOverride() // 覆盖已生成文件
+                            .outputDir("I:\\毕业设计"); // 指定输出目录
+                })
+                .packageConfig(builder -> {
+                    builder.parent("com.kerco.kkc") // 设置父包名
+                            .moduleName("community") // 设置父包模块名
+                            .pathInfo(Collections.singletonMap(OutputFile.xml, "I:\\毕业设计\\mapper")); // 设置mapperXml生成路径
+                })
+                .strategyConfig(builder -> {
+                    builder.addInclude("community_article_star,community_question_star") // 设置需要生成的表名
+                            .addTablePrefix("community_")
+                            .entityBuilder().idType(IdType.ASSIGN_ID)	// 设置过滤表前缀
+                            .serviceBuilder().formatServiceFileName("%sService"); 	//去掉自动生成的I前缀
+
+
+                })
+                .templateEngine(new FreemarkerTemplateEngine()) // 使用Freemarker引擎模板，默认的是Velocity引擎模板
+                .execute();
+    }
 }

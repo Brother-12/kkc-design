@@ -6,4 +6,9 @@
         insert into community_article_content(id,md_content,parse_content,first_img)
         values(#{id},#{mdContent},#{parseContent},#{firstImg})
     </insert>
+
+    <update id="renewArticleContent">
+        update community_article_content set md_content = #{mdContent},parse_content = #{parseContent},first_img = #{firstImg}
+        where id = #{id};
+    </update>
 </mapper>

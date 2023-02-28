@@ -84,4 +84,10 @@ public interface QuestionMapper extends BaseMapper<Question> {
      * @param id 问答id
      */
     void incrQuestionCount(@Param("id") Long id);
+
+    /**
+     * 获取随机问答列表
+     * @return 问答列表
+     */
+    List<CurrencyShowVo> randomQuestionShow();
 }

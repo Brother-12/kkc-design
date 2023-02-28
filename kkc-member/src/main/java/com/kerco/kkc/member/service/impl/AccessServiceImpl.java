@@ -5,7 +5,9 @@ import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.kerco.kkc.common.constant.RedisConstant;
 import com.kerco.kkc.common.utils.JwtUtils;
+import com.kerco.kkc.member.entity.Role;
 import com.kerco.kkc.member.entity.User;
+import com.kerco.kkc.member.entity.UserRole;
 import com.kerco.kkc.member.entity.vo.UserAuthVo;
 import com.kerco.kkc.member.entity.vo.UserRegisterVo;
 import com.kerco.kkc.member.mapper.UserMapper;
@@ -165,6 +167,29 @@ public class AccessServiceImpl implements AccessService {
             }
         }else{
             throw new RuntimeException("验证码有误..");
+        }
+    }
+
+    @Override
+    public String adminLogin(UserAuthVo userAuthVo) {
+        User user = userService.getUserByUsernameAndPassword(userAuthVo.getUsername(), userAuthVo.getPassword());
+        if(Objects.isNull(user)){
+            throw new RuntimeException("登录信息有误，请重新再试。。。");
+        }
+
+        UserRole role = userService.getRole(user.getId());
+        if(role != null){
+            //将用户的关键信息保存到token中，后面可以根据token返回这些信息
+            Map<String,Object> map = new HashMap<>();
+            map.put("id",user.getId());
+            map.put("username",user.getUsername());
+            map.put("avatar",user.getAvatar());
+            //还需进行将token放入到redis中，后续通过redis进行判断token是否有效
+
+            String token = JwtUtils.createJwt(map);
+            return token;
+        }else{
+            throw new RuntimeException("登录信息有误，请重新再试。。。");
         }
     }
 }

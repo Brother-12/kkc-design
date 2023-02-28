@@ -143,7 +143,7 @@ public class ArticleCommentServiceImpl extends ServiceImpl<ArticleCommentMapper,
             message.setOptId(postCommentVo.getId());
             message.setClientId(postCommentVo.getCommentId());
 
-            messageService.acceptCommentMessage(message);
+            messageService.acceptArticleCommentMessage(message);
         }
     }
 }
