@@ -3,8 +3,8 @@ server:
 spring:
   cloud:
     alicloud:
-      access-key: LTAI5t7TUy8H6RuC6axuvQS4
-      secret-key: 2qNGdMoCl3hhyMaj0ju4AB5kc8YKvG
+      access-key: 
+      secret-key: 
       oss:
         endpoint: oss-cn-shenzhen.aliyuncs.com
         bucket: kkc-picture
