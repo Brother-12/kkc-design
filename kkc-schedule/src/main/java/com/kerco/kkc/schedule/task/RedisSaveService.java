@@ -14,7 +14,10 @@ public class RedisSaveService {
     @Autowired
     private CommunityFeign communityFeign;
 
-    @Scheduled(cron = "*/5 * * * * *")
+	/**
+	*	每30分钟将redis保存的数据进行落盘
+	*/
+    @Scheduled(cron = "* */30 * * * *")
     @Async
     public void test(){
         CommonResult commonResult = communityFeign.fixedTimeUpdateThumbsUp();
